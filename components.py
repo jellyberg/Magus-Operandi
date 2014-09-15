@@ -17,7 +17,7 @@ class CollisionComponent:
 
 	def checkForWorldCollisions(self, velocityTuple, data):
 		"""Checks if the master has collided with a static world entity and if so corrects its position"""
-		self.isOnGround = False
+		self.master.isOnGround = False
 		self.collide(velocityTuple[0], 0, data.platforms) # check for x collisions
 		self.collide(0, velocityTuple[1], data.platforms) # check for y collisions
 
@@ -30,22 +30,26 @@ class CollisionComponent:
 		collidedObstacles = pygame.sprite.spritecollide(self.master, obstacles, False)
 		for o in collidedObstacles:
 			if xVel > 0: # right
+				print 'collide right'
 				self.master.rect.right = o.rect.left
 			if xVel < 0: # left
 				self.master.rect.left = o.rect.right
+				print 'collide left'
 			if yVel > 0: # falling
 				self.master.rect.bottom = o.rect.top
-				self.master.onGround = True
+				self.master.isOnGround = True
 				self.master.yVel = 0
+				print 'collide bottom'
 			if yVel < 0: # jumping
 				self.master.rect.top = o.rect.bottom
 				self.master.yVel = 0
+				print 'collide top'
 
 
 
 class GravityComponent:
 	"""A component which will update its master's y velocity and rect's y coordinates"""
-	gravity = 1000
+	gravity = 100
 	terminalVelocity = 400
 	def __init__(self, master):
 		self.master = master
@@ -53,6 +57,7 @@ class GravityComponent:
 
 	def update(self, data):
 		if not self.master.isOnGround:
+			print 'FALL'
 			self.master.yVel += GravityComponent.gravity * data.dt
 			if self.master.yVel > GravityComponent.terminalVelocity:
 				self.master.yVel = GravityComponent.terminalVelocity
