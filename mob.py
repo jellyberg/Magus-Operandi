@@ -6,8 +6,8 @@ from components import Entity, GravityComponent, CollisionComponent
 
 class Player(Entity):
 	image = pygame.image.load('assets/mobs/player.png')
-	moveSpeed = 100
-	jumpVelocity = 20
+	moveSpeed = 300
+	jumpVelocity = 400
 	drag = 120
 	def __init__(self, data):
 		Entity.__init__(self, data)
@@ -25,8 +25,8 @@ class Player(Entity):
 
 	def update(self, data):
 		self.move(data)
-		self.collisions.checkForWorldCollisions((self.xVel, self.yVel), data)
-		print str(self.xVel) + ', ' + str(self.yVel)
+		self.gravity.update(data)
+		self.collisions.checkForWorldCollisions(data)
 
 
 	def move(self, data):
@@ -37,12 +37,12 @@ class Player(Entity):
 		if pygame.locals.K_LEFT in data.input.pressedKeys:
 			self.xVel -= Player.moveSpeed * data.dt
 
-		# if self.xVel > 0:
-		# 	self.xVel -= Player.drag * data.dt
-		# if self.xVel < 0:
-		# 	self.xVel += Player.drag * data.dt
+		if self.xVel > 0:
+			self.xVel -= Player.drag * data.dt
+		if self.xVel < 0:
+			self.xVel += Player.drag * data.dt
 
-		if pygame.locals.K_UP in data.input.pressedKeys and self.isOnGround:
-			self.yVel -= Player.jumpVelocity
+		if pygame.locals.K_UP in data.input.justPressedKeys and self.isOnGround:
+			self.yVel = -Player.jumpVelocity
 
-		self.rect.x += self.xVel
+		self.rect.move_ip(self.xVel, 0)
