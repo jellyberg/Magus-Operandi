@@ -1,4 +1,7 @@
-import pygame
+# 
+# a game by Adam Binks
+
+import pygame, math
 
 
 class Entity(pygame.sprite.Sprite):
@@ -17,8 +20,10 @@ class CollisionComponent:
 
 	def checkForWorldCollisions(self, velocityTuple, data):
 		"""Checks if the master has collided with a static world entity and if so corrects its position"""
-		self.master.isOnGround = False
 		self.collide(velocityTuple[0], 0, data.platforms) # check for x collisions
+		if self.master.obeysGravity:
+			self.master.gravity.update(data)
+		self.master.isOnGround = False
 		self.collide(0, velocityTuple[1], data.platforms) # check for y collisions
 
 
@@ -35,12 +40,12 @@ class CollisionComponent:
 			if xVel < 0: # left
 				self.master.rect.left = o.rect.right
 				print 'collide left'
-			if yVel > 0: # falling
+			if yVel > 0: # collided with floor
 				self.master.rect.bottom = o.rect.top
 				self.master.isOnGround = True
 				self.master.yVel = 0
 				print 'collide bottom'
-			if yVel < 0: # jumping
+			if yVel < 0: # collided with ceiling
 				self.master.rect.top = o.rect.bottom
 				self.master.yVel = 0
 				print 'collide top'
@@ -57,8 +62,11 @@ class GravityComponent:
 
 	def update(self, data):
 		if not self.master.isOnGround:
-			print 'FALL'
 			self.master.yVel += GravityComponent.gravity * data.dt
 			if self.master.yVel > GravityComponent.terminalVelocity:
 				self.master.yVel = GravityComponent.terminalVelocity
-			self.master.rect.y += self.master.yVel * data.dt
+			if 0 < self.master.yVel <= 50:
+				self.master.yVel = 50
+
+			self.master.rect.y += math.ceil(self.master.yVel * data.dt)
+			print 'FALL: ' + str(math.ceil(self.master.yVel * data.dt))
