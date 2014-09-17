@@ -13,6 +13,7 @@ class Player(Entity):
 	def __init__(self, topleft, data):
 		Entity.__init__(self, data)
 		self.add(data.playerGroup)
+		self.add(data.mobs)
 
 		self.image = Player.image
 		self.rect = self.image.get_rect()
@@ -21,6 +22,9 @@ class Player(Entity):
 		self.collisions = CollisionComponent(self)
 		self.gravity = GravityComponent(self)
 		self.obeysGravity = True
+		self.weight = 1
+
+		self.moveSpeedModifier = {'left': 0, 'right': 0} # a number added on to the player's moveSpeed every turn eg when pushing a crate
 
 		self.xVel = self.yVel = 0
 		self.isOnGround = False
@@ -46,9 +50,9 @@ class Player(Entity):
 
 		self.xVel = 0
 		if pygame.locals.K_RIGHT in data.input.pressedKeys:
-			self.xVel += Player.moveSpeed * data.dt
+			self.xVel += Player.moveSpeed * data.dt - self.moveSpeedModifier['right']
 		if pygame.locals.K_LEFT in data.input.pressedKeys:
-			self.xVel -= Player.moveSpeed * data.dt
+			self.xVel -= Player.moveSpeed * data.dt - self.moveSpeedModifier['left']
 
 		if self.xVel > 0:
 			self.xVel -= Player.drag * data.dt
@@ -61,3 +65,4 @@ class Player(Entity):
 			self.lastTimeOnGround = 0
 
 		self.rect.move_ip(self.xVel, 0)
+		self.moveSpeedModifier['right'] = self.moveSpeedModifier['left'] = 0

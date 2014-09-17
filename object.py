@@ -69,3 +69,4 @@ class Crate(DynamicObject):
 		Crate.image.convert()
 		DynamicObject.__init__(self, rect, Crate.image, data, 'PUSHABLE')
 		self.add(data.crates)
+		self.weight = 2.0

@@ -60,6 +60,7 @@ class Data:
 		self.exits = pygame.sprite.Group()
 		self.crates = pygame.sprite.Group()
 
+		self.mobs = pygame.sprite.Group()
 		self.playerGroup = pygame.sprite.Group()
 
 

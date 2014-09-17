@@ -71,6 +71,13 @@ class CollisionComponent:
 		collidedPoints = self.checkCollisionPoints(data, collisionPoints, entitiesToBePushedBy)
 		self.doCollision(collidedPoints, data)
 
+		for key in collidedPoints:
+			if hasattr(collidedPoints[key], 'moveSpeedModifier'):
+				if key in ['topleft', 'bottomleft']:
+					collidedPoints[key].moveSpeedModifier['right'] = 5
+				elif key in ['topright', 'bottomright']:
+					collidedPoints[key].moveSpeedModifier['left'] = 5
+
 
 	def checkIfStandingOn(self, entitiesToStandOn, data):
 		rect = self.master.rect
@@ -97,6 +104,6 @@ class GravityComponent:
 			if self.master.yVel > GravityComponent.terminalVelocity:
 				self.master.yVel = GravityComponent.terminalVelocity
 
-			self.master.rect.y += math.ceil(self.master.yVel * data.dt)
+			self.master.rect.y += math.ceil(self.master.yVel * data.dt) * self.master.weight
 		if self.master.yVel < 0:
-			self.master.rect.y += self.master.yVel * data.dt
+			self.master.rect.y += self.master.yVel * data.dt * self.master.weight
