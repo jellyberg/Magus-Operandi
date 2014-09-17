@@ -17,7 +17,7 @@ class StateHandler:
 		pygame.display.set_caption('Magus Operandi')
 
 		# START GAME
-		self.data.newGame()
+		self.data.newLevel()
 		self.gameHandler = game.GameHandler(self.data)
 
 
@@ -42,14 +42,21 @@ class Data:
 
 		self.FPS = 60
 		self.FPSClock = pygame.time.Clock()
-		self.FPSClock.tick(self.FPS) # so the first dt value isnt really wierd
+		self.FPSClock.tick(self.FPS) # so the first dt value isnt really weird
 
 		self.input = input.Input()
 
 
-	def newGame(self):
+	def newLevel(self):
 		self.entities = pygame.sprite.Group()
+		self.staticObjects = pygame.sprite.Group()
+		self.dynamicObjects = pygame.sprite.Group()
+		self.worldGeometry = pygame.sprite.Group()
+
 		self.platforms = pygame.sprite.Group()
+		self.crates = pygame.sprite.Group()
+
+		self.playerGroup = pygame.sprite.Group()
 
 
 	def saveGame(self):

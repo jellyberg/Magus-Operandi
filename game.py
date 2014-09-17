@@ -2,7 +2,7 @@
 # a game by Adam Binks
 
 import pygame, mob
-from components import Entity
+from object import Platform, Crate
 
 class GameHandler:
 	def __init__(self, data):
@@ -17,6 +17,9 @@ class GameHandler:
 
 		self.player.update(data)
 
+		for object in data.dynamicObjects:
+			object.update(data)
+
 		data.entities.draw(data.gameSurf)
 		data.screen.blit(data.gameSurf, (0, 0))
 
@@ -30,7 +33,7 @@ class GameHandler:
 		level = [
 		"PPPPPPPPPPPPPPPPPPPPPPPPP",
 		"P  P                    P",
-		"P  PPPPPP               P",
+		"P  PPPPPP     C         P",
 		"P  P     P    P         P",
 		"P  P      P   P         P",
 		"P  P       P  P         P",
@@ -42,29 +45,19 @@ class GameHandler:
 		"P  P PP       PPP      PP",
 		"P  PPPPP      PPPP    PPP",
 		"P       P     PPPPP  PPPP",
-		"P        PP   P         P",
-		"P            PP         P",
-		"P          PP P         P",
-		"P       PP    P         P",
-		"P      PPPP   P         P",
+		"P        PP   P CCCCCCC P",
+		"P       C    PP CCCCCCC P",
+		"P          PP P CCCCCCC P",
+		"P       PP    P CCCCCCC P",
+		"P      PPPP   P CCCCCCC P",
 		"PPPPPPPPPPPPPPPPPPPPPPPPP",]
 		# build the level
 		for row in level:
 			for col in row:
 				if col == "P":
 					Platform((x, y), platformSurf, data)
+				if col == 'C':
+					Crate((x, y), data)
 				x += 32
 			y += 32
 			x = 0
-
-
-
-class Platform(Entity):
-	"""A simple static platform"""
-	def __init__(self, topleft, image, data):
-		Entity.__init__(self, data)
-		self.add(data.platforms)
-
-		self.image = image
-		self.rect = image.get_rect()
-		self.rect.topleft = topleft
