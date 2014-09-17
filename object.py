@@ -14,6 +14,7 @@ class StaticObject(Entity):
 		self.rect = rect
 
 
+
 class DynamicObject(Entity):
 	"""An object that can be pushed by the player or other entities and obeys gravity"""
 	def __init__(self, rect, image, data, pushable):
@@ -34,6 +35,7 @@ class DynamicObject(Entity):
 		self.collisions.checkForWorldCollisions(data)
 
 
+
 class Platform(StaticObject):
 	"""A simple static platform"""
 	def __init__(self, topleft, image, data):
@@ -42,6 +44,20 @@ class Platform(StaticObject):
 
 		StaticObject.__init__(self, rect, image, data)
 		self.add(data.platforms)
+
+
+
+class Exit(Entity):
+	"""When the player touches an exit the next level is loaded"""
+	image = pygame.Surface((32, 32))
+	image.fill((220, 180, 220))
+	def __init__(self, topleft, data):
+		Entity.__init__(self, data)
+		self.add(data.exits)
+		self.rect = Exit.image.get_rect()
+		self.rect.topleft = topleft
+		self.image = Exit.image
+
 
 
 class Crate(DynamicObject):

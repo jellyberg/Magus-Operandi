@@ -10,13 +10,13 @@ class Player(Entity):
 	jumpVelocity = 300
 	timeToJumpAfterLeavingGround = 0.2 # number of seconds in which the player can jump after falling off a platform
 	drag = 120 						 # to make platforming less frustrating
-	def __init__(self, data):
+	def __init__(self, topleft, data):
 		Entity.__init__(self, data)
 		self.add(data.playerGroup)
 
 		self.image = Player.image
 		self.rect = self.image.get_rect()
-		self.rect.topleft = (50, 60) # TEMP
+		self.rect.topleft = topleft
 
 		self.collisions = CollisionComponent(self)
 		self.gravity = GravityComponent(self)
@@ -28,6 +28,11 @@ class Player(Entity):
 
 
 	def update(self, data):
+		for exit in data.exits:
+			if self.rect.colliderect(exit.rect):
+				data.gameHandler.nextLevel(data)
+				return
+
 		self.move(data)
 		self.gravity.update(data)
 		self.collisions.checkForWorldCollisions(data)

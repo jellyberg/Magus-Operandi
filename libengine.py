@@ -19,6 +19,7 @@ class StateHandler:
 		# START GAME
 		self.data.newLevel()
 		self.gameHandler = game.GameHandler(self.data)
+		self.data.gameHandler = self.gameHandler
 
 
 	def update(self):
@@ -45,21 +46,28 @@ class Data:
 		self.FPSClock.tick(self.FPS) # so the first dt value isnt really weird
 
 		self.input = input.Input()
+		self.currentLevel = 0
 
 
 	def newLevel(self):
+		"""Called just before a new level is loaded"""
 		self.entities = pygame.sprite.Group()
 		self.staticObjects = pygame.sprite.Group()
 		self.dynamicObjects = pygame.sprite.Group()
 		self.worldGeometry = pygame.sprite.Group()
 
 		self.platforms = pygame.sprite.Group()
+		self.exits = pygame.sprite.Group()
 		self.crates = pygame.sprite.Group()
 
 		self.playerGroup = pygame.sprite.Group()
 
 
 	def saveGame(self):
+		pass
+
+
+	def loadGame(self):
 		pass
 
 
