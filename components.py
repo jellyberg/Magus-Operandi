@@ -121,10 +121,13 @@ class EnchantmentComponent:
 	def update(self, data):
 		"""Update's all enchantments the master entity is under the effect of"""
 		if self.soulBound:
-			self.rect.move_ip(self.soulBound.rect.top - self.soulBinderLastPos[0], self.soulBound.rect.top - self.soulBinderLastPos[1])
+			pygame.draw.line(data.gameSurf, data.RED, self.master.rect.center, self.soulBound.rect.center, 2)
+			if self.soulBound.rect.topleft != self.soulBoundLastPos:
+				self.master.rect.move_ip(self.soulBound.rect.left - self.soulBoundLastPos[0], self.soulBound.rect.top - self.soulBoundLastPos[1])
+			self.soulBoundLastPos = self.soulBound.rect.topleft
 
 
 	def bindSoulTo(self, target):
 		"""When entity A's (master) soul is bound to entity B (target), entity B's movements also act upon entity A"""
 		self.soulBound = target
-		self.soulBinderLastPos = target.rect.topleft
+		self.soulBoundLastPos = target.rect.topleft

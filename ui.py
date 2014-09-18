@@ -37,7 +37,6 @@ class SpellTargeter(pygame.sprite.Sprite):
 		hovered = self.getHovered(data)
 		if hovered and hovered != self.startEntity:
 			if data.input.mouseUnpressed == 1: # LEFT CLICK to cast spell
-				print 'cast'
 				self.kill()
 				return (self.spellName, self.startEntity, hovered)
 			self.drawOutline(hovered.maskOutline, hovered.rect.topleft, data.gameSurf)
@@ -48,7 +47,6 @@ class SpellTargeter(pygame.sprite.Sprite):
 		self.drawOutline(self.startEntity.maskOutline, self.startEntity.rect.topleft, data.gameSurf)
 
 		if data.input.mouseUnpressed == 3: # RIGHT CLICK to cancel
-			print 'cancel'
 			self.kill()
 			return
 

@@ -23,7 +23,8 @@ class GameHandler:
 		data.entities.draw(data.gameSurf)
 
 		if data.spellTargeter:
-			result = data.spellTargeter.update(data)
+			for targeter in data.spellTargeter: # there is only one but this a workaround to get the return value
+				result = targeter.update(data)
 
 			if result is not None:
 				spellCast, spellRoot, spellTarget = result
