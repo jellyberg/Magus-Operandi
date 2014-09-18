@@ -13,9 +13,9 @@ class Entity(pygame.sprite.Sprite):
 
 
 class CollisionComponent:
-	"""
-	A component which will check if its master entity has collided with a static entity and correct its rect's position.
+	"""A component which will check if its master entity has collided with a static entity and correct its rect's position.
 	This component should only be used on the dynamic/movable entities"""
+	slowdownWhilePushing = 5 # slow the mob pushing this entity by x
 	def __init__(self, master):
 		self.master = master
 		self.master.isOnGround = False
@@ -48,7 +48,7 @@ class CollisionComponent:
 		"""Moves the master's rect according to which points have been collided with"""
 		rect = self.master.rect
 		for key in collidedPoints:
-			if key == 'bottom': # do bottom first because entities will most likely be falling fast
+			if key == 'bottom':
 				rect.bottom = collidedPoints[key].rect.top
 				self.master.isOnGround = True
 				self.master.yVel = 0
@@ -71,12 +71,13 @@ class CollisionComponent:
 		collidedPoints = self.checkCollisionPoints(data, collisionPoints, entitiesToBePushedBy)
 		self.doCollision(collidedPoints, data)
 
+		# if applicable, slow the pusher's movespeed by slowdownWhilePushing while pushing
 		for key in collidedPoints:
 			if hasattr(collidedPoints[key], 'moveSpeedModifier'):
 				if key in ['topleft', 'bottomleft']:
-					collidedPoints[key].moveSpeedModifier['right'] = 5
+					collidedPoints[key].moveSpeedModifier['right'] = CollisionComponent.slowdownWhilePushing
 				elif key in ['topright', 'bottomright']:
-					collidedPoints[key].moveSpeedModifier['left'] = 5
+					collidedPoints[key].moveSpeedModifier['left'] = CollisionComponent.slowdownWhilePushing
 
 
 	def checkIfStandingOn(self, entitiesToStandOn, data):
@@ -107,3 +108,23 @@ class GravityComponent:
 			self.master.rect.y += math.ceil(self.master.yVel * data.dt) * self.master.weight
 		if self.master.yVel < 0:
 			self.master.rect.y += self.master.yVel * data.dt * self.master.weight
+
+
+
+class EnchantmentComponent:
+	"""This component allows an entity to be affected by targeted spells"""
+	def __init__(self, master):
+		self.master = master
+		self.soulBound = None
+
+
+	def update(self, data):
+		"""Update's all enchantments the master entity is under the effect of"""
+		if self.soulBound:
+			self.rect.move_ip(self.soulBound.rect.top - self.soulBinderLastPos[0], self.soulBound.rect.top - self.soulBinderLastPos[1])
+
+
+	def bindSoulTo(self, target):
+		"""When entity A's (master) soul is bound to entity B (target), entity B's movements also act upon entity A"""
+		self.soulBound = target
+		self.soulBinderLastPos = target.rect.topleft

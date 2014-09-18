@@ -49,20 +49,24 @@ class Player(Entity):
 			self.lastTimeOnGround = time.time()
 
 		self.xVel = 0
-		if pygame.locals.K_RIGHT in data.input.pressedKeys:
-			self.xVel += Player.moveSpeed * data.dt - self.moveSpeedModifier['right']
-		if pygame.locals.K_LEFT in data.input.pressedKeys:
-			self.xVel -= Player.moveSpeed * data.dt - self.moveSpeedModifier['left']
+		for key in data.input.pressedKeys: # support for multiple keys bound to the same action
+			if key in data.keybinds['right']:
+				self.xVel += Player.moveSpeed * data.dt - self.moveSpeedModifier['right']
+				break
+			if key in data.keybinds['left']:
+				self.xVel -= Player.moveSpeed * data.dt - self.moveSpeedModifier['left']
+				break
 
 		if self.xVel > 0:
 			self.xVel -= Player.drag * data.dt
 		if self.xVel < 0:
 			self.xVel += Player.drag * data.dt
 
-		if pygame.locals.K_UP in data.input.justPressedKeys and \
-				(self.isOnGround or time.time() - self.lastTimeOnGround < Player.timeToJumpAfterLeavingGround):
-			self.yVel = -Player.jumpVelocity
-			self.lastTimeOnGround = 0
+		for key in data.keybinds['jump']:
+			if key in data.input.justPressedKeys and \
+					(self.isOnGround or time.time() - self.lastTimeOnGround < Player.timeToJumpAfterLeavingGround):
+				self.yVel = -Player.jumpVelocity
+				self.lastTimeOnGround = 0
 
 		self.rect.move_ip(self.xVel, 0)
 		self.moveSpeedModifier['right'] = self.moveSpeedModifier['left'] = 0

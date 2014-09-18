@@ -21,6 +21,15 @@ class GameHandler:
 			object.update(data)
 
 		data.entities.draw(data.gameSurf)
+
+		if data.spellTargeter:
+			result = data.spellTargeter.update(data)
+
+			if result is not None:
+				spellCast, spellRoot, spellTarget = result
+				if spellCast == 'soulbind':
+					spellRoot.enchantments.bindSoulTo(spellTarget)
+
 		data.screen.blit(data.gameSurf, (0, 0))
 
 

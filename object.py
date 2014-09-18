@@ -2,7 +2,8 @@
 # a game by Adam Binks
 
 import pygame
-from components import Entity, GravityComponent, CollisionComponent
+from components import Entity, GravityComponent, CollisionComponent, EnchantmentComponent
+from ui import SpellTargeter
 
 class StaticObject(Entity):
 	"""An unmovable object that forms part of the world geometry"""
@@ -21,18 +22,28 @@ class DynamicObject(Entity):
 		Entity.__init__(self, data)
 		self.add(data.dynamicObjects)
 		self.rect = rect
+		self.mask = pygame.mask.from_surface(image)
+		self.maskOutline = self.mask.outline()
+		self.isPushable = pushable
+		
 		self.collisions = CollisionComponent(self)
 		self.gravity = GravityComponent(self)
-		self.isPushable = pushable
+		self.enchantments = EnchantmentComponent(self)
 
 	def update(self, data):
+		self.enchantments.update(data)
+
 		self.gravity.update(data)
+
 		if self.isPushable:
 			data.dynamicObjects.remove(self)
 			self.collisions.checkIfBeingPushed(data.playerGroup.sprites() + data.dynamicObjects.sprites(), data)
 			data.dynamicObjects.add(self)
 		self.collisions.checkIfStandingOn(data.dynamicObjects, data)
 		self.collisions.checkForWorldCollisions(data)
+
+		if not data.spellTargeter and data.input.mouseUnpressed == 1 and self.rect.collidepoint(data.input.mousePos):
+			SpellTargeter(self, data.RED, 'soulbind', data)
 
 
 

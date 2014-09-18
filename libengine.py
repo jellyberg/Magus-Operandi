@@ -2,6 +2,7 @@
 # a game by Adam Binks
 
 import pygame, input, game
+from pygame.locals import *
 
 def run():
 	stateHandler = StateHandler()
@@ -48,6 +49,22 @@ class Data:
 		self.input = input.Input()
 		self.currentLevel = 0
 
+		self.keybinds = {'left': [K_LEFT, K_a], 'right': [K_RIGHT, K_d],
+						 'jump': [K_SPACE, K_UP, K_w]}
+
+		self.WHITE     = (255, 255, 255)
+		self.BLACK     = (  0,   0,   0)
+		self.RED       = (220,  20,  20)
+		self.SKYBLUE   = (135, 206, 250)
+		self.DARKBLUE  = (  0,  35, 102)
+		self.YELLOW    = (255, 255, 102)
+		self.DARKYELLOW= (204, 204,   0)
+		self.GREEN     = (110, 255, 100)
+		self.ORANGE    = (255, 165,   0)
+		self.DARKGREY  = ( 60,  60,  60)
+		self.LIGHTGREY = (180, 180, 180)
+		self.CREAM     = (255, 255, 204)
+
 
 	def newLevel(self):
 		"""Called just before a new level is loaded"""
@@ -62,6 +79,8 @@ class Data:
 
 		self.mobs = pygame.sprite.Group()
 		self.playerGroup = pygame.sprite.Group()
+
+		self.spellTargeter = pygame.sprite.GroupSingle()
 
 
 	def saveGame(self):
