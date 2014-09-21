@@ -46,7 +46,7 @@ class SpellTargeter(pygame.sprite.Sprite):
 		
 		self.drawOutline(self.startEntity.maskOutline, self.startEntity.rect.topleft, data.gameSurf)
 
-		if data.input.mouseUnpressed == 3: # RIGHT CLICK to cancel
+		if data.input.mouseUnpressed == 3 or (hovered is None and data.input.mouseUnpressed == 1): # CLICK to cancel
 			self.kill()
 			return
 

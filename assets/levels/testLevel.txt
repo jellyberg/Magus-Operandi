@@ -6,7 +6,7 @@ P  P      P   P         P
 P  P       P  P         P
 P  P         PP    PPPPPP
 P  P        P P         P
-P *P       P  P         P
+P *P       P  P   B     P
 P  P      P   PPPPPP    P
 P  P E   P    PP        P
 P  P PP       PPP      PP
@@ -15,6 +15,6 @@ P       P     PPPPP  PPPP
 P        PP   P         P
 P       C    PP      CC P
 P          PP P    CCCC P
-P       PP    P CCCCCCC P
-P  C   PPPP  EP CCCCCCC P
+P             P CCCCCCC P
+P  C         EP CCCCCCC P
 PPPPPPPPPPPPPPPPPPPPPPPPP

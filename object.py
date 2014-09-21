@@ -25,6 +25,7 @@ class DynamicObject(Entity):
 		self.mask = pygame.mask.from_surface(image)
 		self.maskOutline = self.mask.outline()
 		self.isPushable = pushable
+		self.movedThisFrame = False
 		
 		self.collisions = CollisionComponent(self)
 		self.gravity = GravityComponent(self)
@@ -42,7 +43,8 @@ class DynamicObject(Entity):
 		self.collisions.checkIfStandingOn(data.dynamicObjects, data)
 		self.collisions.checkForWorldCollisions(data)
 
-		if not data.spellTargeter and data.input.mouseUnpressed == 1 and self.rect.collidepoint(data.input.mousePos):
+		if not data.spellTargeter and data.input.mousePressed == 1 and self.rect.collidepoint(data.input.mousePos):
+			self.enchantments.removeSoulBind()
 			SpellTargeter(self, data.RED, 'soulbind', data)
 
 
@@ -78,6 +80,19 @@ class Crate(DynamicObject):
 		rect = Crate.image.get_rect()
 		rect.topleft = topleft
 		Crate.image.convert()
-		DynamicObject.__init__(self, rect, Crate.image, data, 'PUSHABLE')
+		DynamicObject.__init__(self, rect, self.image, data, 'PUSHABLE')
 		self.add(data.crates)
 		self.weight = 2.0
+
+
+
+class Balloon(DynamicObject):
+	"""A non pushable balloon that floats upwards"""
+	image = pygame.image.load('assets/objects/balloon.png')
+	def __init__(self, topleft, data):
+		rect = Balloon.image.get_rect()
+		rect.topleft = topleft
+		Balloon.image.convert()
+		DynamicObject.__init__(self, rect, self.image, data, 0) # not pushable
+		self.add(data.balloons)
+		self.weight = -0.1

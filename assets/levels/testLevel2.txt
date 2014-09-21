@@ -8,8 +8,8 @@ P                                CC  P
 P                              CCCC  P
 P                         PPPPPPPPPP P
 P                         PPPPPPPPPP P
-P              CC                    P
+P               C                    P
 P           PPPPPPPP                 P
 P    *                               P
-P                   CCCC             P
+P  BBBBB               C             P
 PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP

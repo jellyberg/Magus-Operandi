@@ -31,6 +31,7 @@ class StateHandler:
 		self.gameHandler.update(self.data)
 
 		pygame.display.update()
+		pygame.display.set_caption('Magus Operandi   FPS: %s' %(int(self.data.FPSClock.get_fps())))
 
 
 
@@ -48,6 +49,8 @@ class Data:
 
 		self.input = input.Input()
 		self.currentLevel = 0
+
+		self.CELLSIZE = 32
 
 		self.keybinds = {'left': [K_LEFT, K_a], 'right': [K_RIGHT, K_d],
 						 'jump': [K_SPACE, K_UP, K_w]}
@@ -75,7 +78,9 @@ class Data:
 
 		self.platforms = pygame.sprite.Group()
 		self.exits = pygame.sprite.Group()
+		
 		self.crates = pygame.sprite.Group()
+		self.balloons = pygame.sprite.Group()
 
 		self.mobs = pygame.sprite.Group()
 		self.playerGroup = pygame.sprite.Group()

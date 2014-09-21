@@ -45,7 +45,7 @@ class CollisionComponent:
 
 
 	def doCollision(self, collidedPoints, data):
-		"""Moves the master's rect according to which points have been collided with"""
+		"""Moves the master's rect according to which points have been collided with. Returns True if rect has moved"""
 		rect = self.master.rect
 		for key in collidedPoints:
 			if key == 'bottom':
@@ -73,6 +73,7 @@ class CollisionComponent:
 
 		# if applicable, slow the pusher's movespeed by slowdownWhilePushing while pushing
 		for key in collidedPoints:
+			self.master.movedThisFrame = True
 			if hasattr(collidedPoints[key], 'moveSpeedModifier'):
 				if key in ['topleft', 'bottomleft']:
 					collidedPoints[key].moveSpeedModifier['right'] = CollisionComponent.slowdownWhilePushing
@@ -83,10 +84,9 @@ class CollisionComponent:
 	def checkIfStandingOn(self, entitiesToStandOn, data):
 		rect = self.master.rect
 		collisionPoints = {'bottom': rect.midbottom}
-		# collidedPoints will be a dict with format {collisionPointName: platformCollided}
+		# collidedPoints will be a dict with format {collisionPointName: entityCollided}
 		collidedPoints = self.checkCollisionPoints(data, collisionPoints, entitiesToStandOn)
 		self.doCollision(collidedPoints, data)
-
 
 
 
@@ -100,12 +100,16 @@ class GravityComponent:
 
 
 	def update(self, data):
-		if not self.master.isOnGround:
+		if not self.master.isOnGround or self.master.weight < 0: # on ground or floats
 			self.master.yVel += GravityComponent.gravity * data.dt
 			if self.master.yVel > GravityComponent.terminalVelocity:
 				self.master.yVel = GravityComponent.terminalVelocity
 
 			self.master.rect.y += math.ceil(self.master.yVel * data.dt) * self.master.weight
+			if self.master in data.dynamicObjects:
+				self.master.movedThisFrame = True
+				print str(self.master.yVel)
+
 		if self.master.yVel < 0:
 			self.master.rect.y += self.master.yVel * data.dt * self.master.weight
 
@@ -116,18 +120,68 @@ class EnchantmentComponent:
 	def __init__(self, master):
 		self.master = master
 		self.soulBound = None
+		self.isSoulBinder = False
 
 
 	def update(self, data):
 		"""Update's all enchantments the master entity is under the effect of"""
 		if self.soulBound:
-			pygame.draw.line(data.gameSurf, data.RED, self.master.rect.center, self.soulBound.rect.center, 2)
-			if self.soulBound.rect.topleft != self.soulBoundLastPos:
-				self.master.rect.move_ip(self.soulBound.rect.left - self.soulBoundLastPos[0], self.soulBound.rect.top - self.soulBoundLastPos[1])
-			self.soulBoundLastPos = self.soulBound.rect.topleft
+			if self.isSoulBinder: # only run this code for one of the two entities
+				pygame.draw.line(data.gameSurf, data.RED, self.master.rect.center, self.soulBound.rect.center, 2)
+
+			rectOffset = self.getRectOffset(self.master.rect, self.soulBound.rect)
+			if rectOffset != self.soulBoundOffset: # need to update one of the rects
+				if self.soulBound.movedThisFrame:
+					xToMove = self.soulBoundOffset[0] - rectOffset[0]
+
+					if xToMove:
+						# MOVE BIT BY BIT UNTIL COLLIDES WITH A WALL OR REACHES THE CORRECT OFFSET
+						rect = self.master.rect
+						if xToMove > 0:
+							step = data.CELLSIZE / 3
+						else:
+							step = -(data.CELLSIZE / 3)
+
+						for x in range(0, xToMove, step):
+							self.master.rect.move_ip(x, 0)
+							collidedPoints = self.master.collisions.checkCollisionPoints(data,
+								{'topleft': (rect.left, rect.top + 10), 'bottomleft': (rect.left, rect.bottom - 10),
+							   'topright': (rect.right, rect.top + 10), 'bottomright': (rect.right, rect.bottom - 10)},
+							   data.worldGeometry)
+							if collidedPoints:
+								self.soulBoundOffset = self.getRectOffset(self.master.rect, self.soulBound.rect)
+								self.soulBound.enchantments.soulBoundOffset = self.getRectOffset(self.soulBound.rect, self.master.rect)
+								break
+
+					if self.soulBound.yVel != 0:
+						print 'yeah man'
+						self.master.yVel = self.soulBound.yVel * 100
+
+		self.lastRectTopleft = self.master.rect.topleft
+		self.master.movedThisFrame = False
 
 
 	def bindSoulTo(self, target):
-		"""When entity A's (master) soul is bound to entity B (target), entity B's movements also act upon entity A"""
+		"""When entity A's (master) soul is bound to entity B (target), entity A's movements also act upon entity B and vice versa"""
+		target.enchantments.removeSoulBind() # entities may only be bound to one other entity
 		self.soulBound = target
-		self.soulBoundLastPos = target.rect.topleft
+		self.isSoulBinder = True
+		target.enchantments.isSoulBinder = False
+		target.enchantments.soulBound = self.master
+		self.soulBoundOffset = self.getRectOffset(self.master.rect, target.rect)
+		target.enchantments.soulBoundOffset = self.getRectOffset(target.rect, self.master.rect)
+		self.lastRectTopleft = self.master.rect.topleft
+		target.enchantments.lastRectTopleft = target.rect.topleft
+
+
+	def getRectOffset(self, rect1, rect2):
+		"""Returns a tuple of the x difference and y difference of the two rects"""
+		return (rect1.left - rect2.left, rect1.top - rect2.top)
+
+
+	def removeSoulBind(self, isInitial=True):
+		"""Removes any remnants of soul binding"""
+		if self.soulBound and isInitial:
+			self.soulBound.enchantments.removeSoulBind(False)
+		self.soulBound = None
+		self.isSoulBinder = False

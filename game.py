@@ -2,7 +2,7 @@
 # a game by Adam Binks
 
 import pygame
-from object import Platform, Exit, Crate
+from object import Platform, Exit, Crate, Balloon
 from mob import Player
 
 class GameHandler:
@@ -37,6 +37,8 @@ class GameHandler:
 	def nextLevel(self, data):
 		"""Load and start the next level"""
 		data.currentLevel += 1 # starts at 0
+		if data.currentLevel >= len(GameHandler.levelFileNames):
+			data.input.terminate()
 		data.newLevel()
 		self.loadLevelFile(GameHandler.levelFileNames[data.currentLevel], data)
 
@@ -44,7 +46,7 @@ class GameHandler:
 	def loadLevelFile(self, filename, data):
 		"""Load a level from a .txt file in the folder assets/levels"""
 		# TEMP
-		platformSurf = pygame.Surface((32, 32))
+		platformSurf = pygame.Surface((data.CELLSIZE, data.CELLSIZE))
 		platformSurf.fill((50, 200, 60))
 
 		level = open('assets/levels/' + filename + '.txt', 'r')
@@ -59,8 +61,10 @@ class GameHandler:
 					Exit((x, y), data)
 				if col == 'C':
 					Crate((x, y), data)
+				if col == 'B':
+					Balloon((x, y), data)
 				if col == '*':
 					Player((x, y), data)
-				x += 32
-			y += 32
+				x += data.CELLSIZE
+			y += data.CELLSIZE
 			x = 0
