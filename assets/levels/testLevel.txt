@@ -13,8 +13,8 @@ P  P PP       PPP      PP
 P  PPPPP      PPPP    PPP
 P       P     PPPPP  PPPP
 P        PP   P         P
-P       C    PP      CC P
-P          PP P    CCCC P
-P             P CCCCCCC P
-P  C         EP CCCCCCC P
+P            PP      CC P
+P     K   PPPPP    CCCC P
+P        C P EP CCCCCCC P
+P  C    LP    P CCCCCCC P
 PPPPPPPPPPPPPPPPPPPPPPPPP

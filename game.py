@@ -2,7 +2,7 @@
 # a game by Adam Binks
 
 import pygame
-from object import Platform, Exit, Crate, Balloon
+from object import Platform, Exit, Crate, Balloon, Key, Lock
 from mob import Player
 
 class GameHandler:
@@ -63,6 +63,10 @@ class GameHandler:
 					Crate((x, y), data)
 				if col == 'B':
 					Balloon((x, y), data)
+				if col == 'K':
+					Key((x, y), data)
+				if col == 'L':
+					Lock((x, y), data)
 				if col == '*':
 					Player((x, y), data)
 				x += data.CELLSIZE

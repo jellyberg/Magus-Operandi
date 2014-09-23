@@ -10,6 +10,6 @@ P                         PPPPPPPPPP P
 P                         PPPPPPPPPP P
 P               C                    P
 P           PPPPPPPP                 P
-P    *                               P
-P  BBBBB               C             P
+P                                    P
+P                      C          *  P
 PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP

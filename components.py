@@ -100,7 +100,7 @@ class GravityComponent:
 
 
 	def update(self, data):
-		if not self.master.isOnGround or self.master.weight < 0: # on ground or floats
+		if not self.master.isOnGround or (self.master.weight < 0 or self.master.yVel < 0): # on ground or floats
 			self.master.yVel += GravityComponent.gravity * data.dt
 			if self.master.yVel > GravityComponent.terminalVelocity:
 				self.master.yVel = GravityComponent.terminalVelocity
@@ -108,7 +108,6 @@ class GravityComponent:
 			self.master.rect.y += math.ceil(self.master.yVel * data.dt) * self.master.weight
 			if self.master in data.dynamicObjects:
 				self.master.movedThisFrame = True
-				print str(self.master.yVel)
 
 		if self.master.yVel < 0:
 			self.master.rect.y += self.master.yVel * data.dt * self.master.weight
@@ -154,7 +153,6 @@ class EnchantmentComponent:
 								break
 
 					if self.soulBound.yVel != 0:
-						print 'yeah man'
 						self.master.yVel = self.soulBound.yVel * 100
 
 		self.lastRectTopleft = self.master.rect.topleft

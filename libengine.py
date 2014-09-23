@@ -80,6 +80,9 @@ class Data:
 		self.exits = pygame.sprite.Group()
 		
 		self.crates = pygame.sprite.Group()
+		self.keys = pygame.sprite.Group()
+		self.locks = pygame.sprite.Group()
+		self.unlockableWithKeys = pygame.sprite.Group()
 		self.balloons = pygame.sprite.Group()
 
 		self.mobs = pygame.sprite.Group()
