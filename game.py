@@ -6,9 +6,9 @@ from object import Platform, Exit, Crate, Balloon, Key, Lock
 from mob import Player
 
 class GameHandler:
-	levelFileNames = ['testLevel', 'testLevel2']
+	levelFileNames = ['introducingKeys', 'testLevel', 'testLevel2']
 	def __init__(self, data):
-		self.loadLevelFile('testLevel', data)
+		self.loadLevelFile(GameHandler.levelFileNames[data.currentLevel], data)
 
 
 	def update(self, data):
@@ -31,7 +31,7 @@ class GameHandler:
 				if spellCast == 'soulbind':
 					spellRoot.enchantments.bindSoulTo(spellTarget)
 
-		data.screen.blit(data.gameSurf, (0, 0))
+		data.screen.blit(data.gameSurf, data.gameRect)
 
 
 	def nextLevel(self, data):
@@ -45,14 +45,23 @@ class GameHandler:
 
 	def loadLevelFile(self, filename, data):
 		"""Load a level from a .txt file in the folder assets/levels"""
+		data.screen.fill((20, 20, 20))
 		# TEMP
 		platformSurf = pygame.Surface((data.CELLSIZE, data.CELLSIZE))
 		platformSurf.fill((50, 200, 60))
 
 		level = open('assets/levels/' + filename + '.txt', 'r')
 		x = y = 0
+		longestRowLength = 0
+		levelHeight = 0
+
 		# build the level
 		for row in level:
+			levelHeight += 1
+
+			if len(row) > longestRowLength: # UPDATE LONGEST ROW
+				longestRowLength = len(row)
+
 			for col in row:
 				col = col.upper()
 				if col == "P":
@@ -72,3 +81,12 @@ class GameHandler:
 				x += data.CELLSIZE
 			y += data.CELLSIZE
 			x = 0
+
+		data.levelWidth = longestRowLength * data.CELLSIZE
+		data.levelHeight = levelHeight * data.CELLSIZE
+
+		data.gameSurf = pygame.Surface((data.levelWidth, data.levelHeight))
+		data.gameSurf.convert()
+
+		data.gameRect = data.gameSurf.get_rect()
+		data.gameRect.center = (data.WINDOWWIDTH / 2, data.WINDOWHEIGHT / 2)

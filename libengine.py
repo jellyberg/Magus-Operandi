@@ -48,7 +48,7 @@ class Data:
 		self.FPSClock.tick(self.FPS) # so the first dt value isnt really weird
 
 		self.input = input.Input()
-		self.currentLevel = 0
+		self.currentLevel = 1 # TEMP FOR TESTING should normally be = 0
 
 		self.CELLSIZE = 32
 
@@ -70,7 +70,7 @@ class Data:
 
 
 	def newLevel(self):
-		"""Called just before a new level is loaded"""
+		"""Called just before a new level is loaded to reset everything"""
 		self.entities = pygame.sprite.Group()
 		self.staticObjects = pygame.sprite.Group()
 		self.dynamicObjects = pygame.sprite.Group()

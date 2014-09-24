@@ -129,7 +129,7 @@ class Key(DynamicObject):
 
 
 	def update(self, data):
-		"""Check if unlocking door"""
+		"""Check if unlocking door (within 10 pixels of one)"""
 		collidedPoints = self.collisions.checkCollisionPoints(data, 
 				{'left': (self.rect.left - 10, self.rect.centery), 'right': (self.rect.right + 10, self.rect.centery),
 				'top': (self.rect.centerx, self.rect.top - 10), 'bottom': (self.rect.centerx, self.rect.bottom + 10),

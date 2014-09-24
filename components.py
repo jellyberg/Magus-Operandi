@@ -75,10 +75,10 @@ class CollisionComponent:
 		for key in collidedPoints:
 			self.master.movedThisFrame = True
 			if hasattr(collidedPoints[key], 'moveSpeedModifier'):
+				if key in ['topright', 'bottomright']:
+					collidedPoints[key].moveSpeedModifier['left'] = CollisionComponent.slowdownWhilePushing
 				if key in ['topleft', 'bottomleft']:
 					collidedPoints[key].moveSpeedModifier['right'] = CollisionComponent.slowdownWhilePushing
-				elif key in ['topright', 'bottomright']:
-					collidedPoints[key].moveSpeedModifier['left'] = CollisionComponent.slowdownWhilePushing
 
 
 	def checkIfStandingOn(self, entitiesToStandOn, data):
@@ -125,6 +125,10 @@ class EnchantmentComponent:
 	def update(self, data):
 		"""Update's all enchantments the master entity is under the effect of"""
 		if self.soulBound:
+			if not self.soulBound in data.entities:
+				self.removeSoulBind()
+				return
+			
 			if self.isSoulBinder: # only run this code for one of the two entities
 				pygame.draw.line(data.gameSurf, data.RED, self.master.rect.center, self.soulBound.rect.center, 2)
 

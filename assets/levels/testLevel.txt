@@ -16,5 +16,5 @@ P        PP   P         P
 P            PP      CC P
 P     K   PPPPP    CCCC P
 P        C P EP CCCCCCC P
-P  C    LP    P CCCCCCC P
+P  C     L      CCCCCCC P
 PPPPPPPPPPPPPPPPPPPPPPPPP
