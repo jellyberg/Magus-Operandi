@@ -12,13 +12,15 @@ class GameHandler:
 
 
 	def update(self, data):
+		data.gameMousePos = (data.input.mousePos[0] - data.gameRect.left, data.input.mousePos[1] - data.gameRect.top)
+
 		data.gameSurf.fill((50, 50, 50))
 
 		for player in data.playerGroup:
 			player.update(data)
 
-		for object in data.dynamicObjects:
-			object.update(data)
+		for dynObject in data.dynamicObjects:
+			dynObject.update(data)
 
 		data.entities.draw(data.gameSurf)
 
@@ -60,7 +62,7 @@ class GameHandler:
 			levelHeight += 1
 
 			if len(row) > longestRowLength: # UPDATE LONGEST ROW
-				longestRowLength = len(row)
+				longestRowLength = len(row) - 1
 
 			for col in row:
 				col = col.upper()

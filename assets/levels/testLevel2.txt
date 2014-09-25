@@ -1,15 +1,15 @@
-PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
-P                                    P
-P                                    P
-P          E                         P
-P      PPPPPPPPP                     P
-P      PPPPPPPPP                  C  P
-P                                CC  P
-P                              CCCC  P
-P                         PPPPPPPPPP P
-P                         PPPPPPPPPP P
-P               C                    P
-P           PPPPPPPP                 P
-P                                    P
-P                      C          *  P
-PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+P                             P
+P                             P
+P    E                        P
+P PPPPPPPP                    P
+P PPPPPPPP                 C  P
+P                         CC  P
+P                       CCCC  P
+P                  PPPPPPPPPP P
+P                  PPPPPPPPPP P
+P         C                   P
+P     PPPPPPPP                P
+P                             P
+P               C          *  P
+PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP

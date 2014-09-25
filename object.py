@@ -43,7 +43,7 @@ class DynamicObject(Entity):
 		self.collisions.checkIfStandingOn(data.dynamicObjects, data)
 		self.collisions.checkForWorldCollisions(data)
 
-		if not data.spellTargeter and data.input.mousePressed == 1 and self.rect.collidepoint(data.input.mousePos):
+		if not data.spellTargeter and data.input.mousePressed == 1 and self.rect.collidepoint(data.gameMousePos):
 			self.enchantments.removeSoulBind()
 			SpellTargeter(self, data.RED, 'soulbind', data)
 

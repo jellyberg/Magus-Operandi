@@ -42,7 +42,7 @@ class SpellTargeter(pygame.sprite.Sprite):
 			self.drawOutline(hovered.maskOutline, hovered.rect.topleft, data.gameSurf)
 			pygame.draw.line(data.gameSurf, self.colour, self.startEntity.rect.center, hovered.rect.center, 2)
 		else:
-			pygame.draw.line(data.gameSurf, self.colour, self.startEntity.rect.center, data.input.mousePos, 2)
+			pygame.draw.line(data.gameSurf, self.colour, self.startEntity.rect.center, data.gameMousePos, 2)
 		
 		self.drawOutline(self.startEntity.maskOutline, self.startEntity.rect.topleft, data.gameSurf)
 
@@ -54,7 +54,7 @@ class SpellTargeter(pygame.sprite.Sprite):
 	def getHovered(self, data):
 		"""Get the hovered dynamic object"""
 		for entity in data.dynamicObjects:
-			if entity.rect.collidepoint(data.input.mousePos):
+			if entity.rect.collidepoint(data.gameMousePos):
 				return entity
 		return None
 

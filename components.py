@@ -19,6 +19,7 @@ class CollisionComponent:
 	def __init__(self, master):
 		self.master = master
 		self.master.isOnGround = False
+		self.wasStandingOn = None
 
 
 	def checkForWorldCollisions(self, data):
@@ -87,6 +88,8 @@ class CollisionComponent:
 		# collidedPoints will be a dict with format {collisionPointName: entityCollided}
 		collidedPoints = self.checkCollisionPoints(data, collisionPoints, entitiesToStandOn)
 		self.doCollision(collidedPoints, data)
+		if collidedPoints:
+			self.wasStandingOn = collidedPoints['bottom']
 
 
 
@@ -154,12 +157,14 @@ class EnchantmentComponent:
 							if collidedPoints:
 								self.soulBoundOffset = self.getRectOffset(self.master.rect, self.soulBound.rect)
 								self.soulBound.enchantments.soulBoundOffset = self.getRectOffset(self.soulBound.rect, self.master.rect)
+								self.master.rect.move_ip(-1, 0)
+								print str(self.soulBoundOffset)
 								break
 
 					if self.soulBound.yVel != 0:
 						self.master.yVel = self.soulBound.yVel * 100
 
-		self.lastRectTopleft = self.master.rect.topleft
+		self.master.lastRectTopleft = self.master.rect.topleft
 		self.master.movedThisFrame = False
 
 
@@ -172,8 +177,8 @@ class EnchantmentComponent:
 		target.enchantments.soulBound = self.master
 		self.soulBoundOffset = self.getRectOffset(self.master.rect, target.rect)
 		target.enchantments.soulBoundOffset = self.getRectOffset(target.rect, self.master.rect)
-		self.lastRectTopleft = self.master.rect.topleft
-		target.enchantments.lastRectTopleft = target.rect.topleft
+		self.master.lastRectTopleft = self.master.rect.topleft
+		target.lastRectTopleft = target.rect.topleft
 
 
 	def getRectOffset(self, rect1, rect2):
