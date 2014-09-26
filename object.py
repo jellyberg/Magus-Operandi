@@ -91,6 +91,12 @@ class Exit(Entity):
 
 
 
+# class Button(StaticObject):
+# 	"""A button that is activated while colliding with dynamic objects or the player"""
+# 	def __init__(self, )
+# 		image = pygame.image.load('assets/object/')
+
+
 class Crate(DynamicObject):
 	"""A simple pushable crate, obeys gravity"""
 	image = pygame.image.load('assets/objects/crate.png')
