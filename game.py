@@ -1,7 +1,7 @@
 #
 # a game by Adam Binks
 
-import pygame, pytmx
+import pygame
 from object import Platform, Exit, Crate, Balloon, Key, Lock
 from mob import Player
 
@@ -46,54 +46,49 @@ class GameHandler:
 
 
 	def loadLevelFile(self, filename, data):
-		"""Load a level from a .tmx file in the folder assets/levels"""
+		"""Load a level from a .txt file in the folder assets/levels"""
 		data.screen.fill((20, 20, 20))
+		# TEMP
+		platformSurf = pygame.Surface((data.CELLSIZE, data.CELLSIZE))
+		platformSurf.fill((50, 200, 60))
 
+		level = open('assets/levels/' + filename + '.txt', 'r')
+		x = y = 0
+		longestRowLength = 0
+		levelHeight = 0
 
-	# def loadLevelFile(self, filename, data):
-	# 	"""Load a level from a .txt file in the folder assets/levels"""
-	# 	data.screen.fill((20, 20, 20))
-	# 	# TEMP
-	# 	platformSurf = pygame.Surface((data.CELLSIZE, data.CELLSIZE))
-	# 	platformSurf.fill((50, 200, 60))
+		# build the level
+		for row in level:
+			levelHeight += 1
 
-	# 	level = open('assets/levels/' + filename + '.txt', 'r')
-	# 	x = y = 0
-	# 	longestRowLength = 0
-	# 	levelHeight = 0
+			if len(row) > longestRowLength: # UPDATE LONGEST ROW
+				longestRowLength = len(row) - 1
 
-	# 	# build the level
-	# 	for row in level:
-	# 		levelHeight += 1
+			for col in row:
+				col = col.upper()
+				if col == "P":
+					Platform((x, y), platformSurf, data)
+				if col == 'E':
+					Exit((x, y), data)
+				if col == 'C':
+					Crate((x, y), data)
+				if col == 'B':
+					Balloon((x, y), data)
+				if col == 'K':
+					Key((x, y), data)
+				if col == 'L':
+					Lock((x, y), data)
+				if col == '*':
+					Player((x, y), data)
+				x += data.CELLSIZE
+			y += data.CELLSIZE
+			x = 0
 
-	# 		if len(row) > longestRowLength: # UPDATE LONGEST ROW
-	# 			longestRowLength = len(row) - 1
+		data.levelWidth = longestRowLength * data.CELLSIZE
+		data.levelHeight = levelHeight * data.CELLSIZE
 
-	# 		for col in row:
-	# 			col = col.upper()
-	# 			if col == "P":
-	# 				Platform((x, y), platformSurf, data)
-	# 			if col == 'E':
-	# 				Exit((x, y), data)
-	# 			if col == 'C':
-	# 				Crate((x, y), data)
-	# 			if col == 'B':
-	# 				Balloon((x, y), data)
-	# 			if col == 'K':
-	# 				Key((x, y), data)
-	# 			if col == 'L':
-	# 				Lock((x, y), data)
-	# 			if col == '*':
-	# 				Player((x, y), data)
-	# 			x += data.CELLSIZE
-	# 		y += data.CELLSIZE
-	# 		x = 0
+		data.gameSurf = pygame.Surface((data.levelWidth, data.levelHeight))
+		data.gameSurf.convert()
 
-	# 	data.levelWidth = longestRowLength * data.CELLSIZE
-	# 	data.levelHeight = levelHeight * data.CELLSIZE
-
-	# 	data.gameSurf = pygame.Surface((data.levelWidth, data.levelHeight))
-	# 	data.gameSurf.convert()
-
-	# 	data.gameRect = data.gameSurf.get_rect()
-	# 	data.gameRect.center = (data.WINDOWWIDTH / 2, data.WINDOWHEIGHT / 2)
+		data.gameRect = data.gameSurf.get_rect()
+		data.gameRect.center = (data.WINDOWWIDTH / 2, data.WINDOWHEIGHT / 2)

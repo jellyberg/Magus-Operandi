@@ -48,7 +48,7 @@ class Data:
 		self.FPSClock.tick(self.FPS) # so the first dt value isnt really weird
 
 		self.input = input.Input()
-		self.currentLevel = 2 # TEMP FOR TESTING should normally be = 0
+		self.currentLevel = 0 # TEMP FOR TESTING should normally be = 0
 
 		self.CELLSIZE = 32
 

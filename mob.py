@@ -7,8 +7,8 @@ from components import Entity, GravityComponent, CollisionComponent
 class Player(Entity):
 	image = pygame.image.load('assets/mobs/player.png')
 	moveSpeed = 300
-	jumpVelocity = 200
-	jumpHoldIncrease = 300
+	jumpVelocity = 250
+	jumpHoldIncrease = 150
 	timeToJumpAfterLeavingGround = 0.2 # number of seconds in which the player can jump after falling off a platform
 	drag = 120 						 # to make platforming less frustrating
 	def __init__(self, topleft, data):
