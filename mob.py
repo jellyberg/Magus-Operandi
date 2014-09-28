@@ -6,8 +6,8 @@ from components import Entity, GravityComponent, CollisionComponent, AnimationCo
 
 class Player(Entity):
 	moveSpeed = 300
-	jumpVelocity = 300
-	jumpHoldIncrease = 150
+	jumpVelocity = 400
+	jumpHoldIncrease = 200
 	timeToJumpAfterLeavingGround = 0.2 # number of seconds in which the player can jump after falling off a platform
 	drag = 120 						 # to make platforming less frustrating
 	def __init__(self, topleft, data):

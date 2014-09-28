@@ -38,8 +38,8 @@ class StateHandler:
 class Data:
 	"""stores variables to be accessed in many parts of the game"""
 	def __init__(self):
-		self.WINDOWWIDTH, self.WINDOWHEIGHT = (1920, 800)
-		self.screen = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT))
+		self.WINDOWWIDTH, self.WINDOWHEIGHT = (1920, 1080)
+		self.screen = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT), FULLSCREEN)
 		self.gameSurf = pygame.Surface(self.screen.get_size())
 		self.gameSurf.convert()
 

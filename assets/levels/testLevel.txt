@@ -1,16 +1,4 @@
 PPPPPPPPPPPPPPPPPPPPPPPPP
-P  P                    P
-P  PPPPPP     C         P
-P  P     P    P         P
-P  P      P   P         P
-P  P       P  P         P
-P  P         PP    PPPPPP
-P  P        P P         P
-P *P       P  P   B     P
-P  P      P   PPPPPP    P
-P  P E   P    PP        P
-P  P PP       PPP      PP
-P  PPPPP      PPPP    PPP
 P       P     PPPPP  PPPP
 P        PP   P         P
 P            PP      CC P

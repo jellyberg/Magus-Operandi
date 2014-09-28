@@ -1,16 +1,16 @@
-PPPPPPPPPPPPPPPPPPPPPPPPPPP
-PPPPPPPPPPPPPPPPPPPPPPPPPPP
-PPPPPPPPPPPPPPPPPPPPPPPCPPP
-PPPPPPPPPPPPPPPPPPPPPPPCPPP
-PP              K      L PP
-PPPPPPPPPPPPPPPPPPPPPPP PPP
-PP                       PP
-PP                      EPP
-PP                      PPP
-PP                       PP
-PP        *              PP
-PP                       PP
-PP                       PP
-PP     C          P      PP
-PPPPPPPPPPPPPPPPPPPPPPPPPPP
-PPPPPPPPPPPPPPPPPPPPPPPPPPP
+PPPPPPPPPPPPPPPPPPPP
+PPPPPPPPPPPPPPPPCPPP
+PPPPPPPPPPPPPPPPCPPP
+PPPPPPPPPPPPPPPP PPP
+PP            K L PP
+PPPPPPPPPPPPPPPP PPP
+PP                PP
+PP               EPP
+PP               PPP
+PP                PP
+PP    *           PP
+PP                PP
+PP                PP
+PP  C     P       PP
+PPPPPPPPPPPPPPPPPPPP
+PPPPPPPPPPPPPPPPPPPP
