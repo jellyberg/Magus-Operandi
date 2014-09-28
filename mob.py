@@ -2,12 +2,11 @@
 # a game by Adam Binks
 
 import pygame, time
-from components import Entity, GravityComponent, CollisionComponent
+from components import Entity, GravityComponent, CollisionComponent, AnimationComponent
 
 class Player(Entity):
-	image = pygame.image.load('assets/mobs/player.png')
 	moveSpeed = 300
-	jumpVelocity = 250
+	jumpVelocity = 300
 	jumpHoldIncrease = 150
 	timeToJumpAfterLeavingGround = 0.2 # number of seconds in which the player can jump after falling off a platform
 	drag = 120 						 # to make platforming less frustrating
@@ -16,11 +15,12 @@ class Player(Entity):
 		self.add(data.playerGroup)
 		self.add(data.mobs)
 
-		self.image = Player.image
-		self.rect = self.image.get_rect()
-		self.rect.topleft = topleft
+		self.animation = AnimationComponent(self, { 'run': {'spritesheet': pygame.image.load('assets/mobs/player/run.png'),
+														   'imageWidth': 128, 'timePerFrame': 0.06, 'flip': True},
+													'jump': {'spritesheet': pygame.image.load('assets/mobs/player/jump.png'),
+														   'imageWidth': 128, 'timePerFrame': 0.1, 'flip': True}})
 
-		self.collisions = CollisionComponent(self)
+		self.collisions = CollisionComponent(self, pygame.Rect((topleft), (83, 128)))
 		self.gravity = GravityComponent(self)
 		self.obeysGravity = True
 		self.weight = 1
@@ -28,9 +28,16 @@ class Player(Entity):
 		self.moveSpeedModifier = {'left': 0, 'right': 0} # a number added on to the player's moveSpeed every turn eg when pushing a crate
 
 		self.xVel = self.yVel = 0
+		self.facing = 'R'
 		self.isOnGround = False
 		self.lastTimeOnGround = 0
 		self.releasedJumpButton = True
+
+		self.animation.play('runR')
+		self.animation.update()
+
+		self.rect = self.image.get_rect()
+		self.rect.topleft = topleft
 
 
 	def update(self, data):
@@ -43,6 +50,7 @@ class Player(Entity):
 		self.gravity.update(data)
 		self.collisions.checkForWorldCollisions(data)
 		self.collisions.checkIfStandingOn(data.dynamicObjects, data)
+		self.animation.update()
 
 
 	def move(self, data):
@@ -54,9 +62,15 @@ class Player(Entity):
 		for key in data.input.pressedKeys: # support for multiple keys bound to the same action
 			if key in data.keybinds['right']:
 				self.xVel += Player.moveSpeed * data.dt - self.moveSpeedModifier['right']
+				self.facing = 'R'
+				if self.isOnGround:
+					self.animation.play('runR')
 				break
 			if key in data.keybinds['left']:
 				self.xVel -= Player.moveSpeed * data.dt - self.moveSpeedModifier['left']
+				self.facing = 'L'
+				if self.isOnGround:
+					self.animation.play('runL')
 				break
 
 		if self.xVel > 0:
@@ -71,6 +85,7 @@ class Player(Entity):
 					self.yVel = -Player.jumpVelocity
 					self.lastTimeOnGround = 0
 					self.releasedJumpButton = False
+					self.animation.playOnce('jump' + self.facing)
 					break
 			# OR if jumping up and jump is still held, jump a bit higher
 			elif key in data.input.pressedKeys and self.yVel < -1 and not self.releasedJumpButton:

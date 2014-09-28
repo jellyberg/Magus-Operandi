@@ -1,7 +1,7 @@
 # 
 # a game by Adam Binks
 
-import pygame, math
+import pygame, math, time
 
 
 class Entity(pygame.sprite.Sprite):
@@ -16,16 +16,24 @@ class CollisionComponent:
 	"""A component which will check if its master entity has collided with a static entity and correct its rect's position.
 	This component should only be used on the dynamic/movable entities"""
 	slowdownWhilePushing = 5 # slow the mob pushing this entity by x
-	def __init__(self, master):
+	def __init__(self, master, collisionRect=None):
+		"""collisionRect can be a different sized rect to the rendering rect for more accurate collision detection"""
 		self.master = master
 		self.master.isOnGround = False
 		self.wasStandingOn = None
+		self.collisionRect = collisionRect
 
 
 	def checkForWorldCollisions(self, data):
-		"""Checks whether 6 collision points collide with the world geometry, and if so move the entity's rect"""
-		rect = self.master.rect
-		collisionPoints = {'top': (rect.midtop), 'bottom': (rect.midbottom),
+		"""Checks whether 9 collision points collide with the world geometry, and if so move the entity's rect"""
+		if self.collisionRect:
+			rect = self.collisionRect
+			self.collisionRect.center = self.master.rect.center
+		else:
+			rect = self.master.rect
+
+		collisionPoints = {'top': (rect.midtop), 'bottomC': (rect.midbottom),
+						   'bottomL': (rect.left + 20, rect.bottom), 'bottomR': (rect.right - 20, rect.bottom),
 						   'topleft': (rect.left, rect.top + 10), 'bottomleft': (rect.left, rect.bottom - 10),
 						   'topright': (rect.right, rect.top + 10), 'bottomright': (rect.right, rect.bottom - 10)} # points to check collision
 
@@ -38,33 +46,58 @@ class CollisionComponent:
 	def checkCollisionPoints(self, data, pointsDict, groupToCollide):
 		"""Checks whether each of the up to 6 passed collision points collides with a rect of any of the passed group"""
 		collidedPoints = {}
-		for platform in groupToCollide:
+		for obstacle in groupToCollide:
 			for key in pointsDict:
-				if platform.rect.collidepoint(pointsDict[key]):
-					collidedPoints[key] = platform
+				try:  # use collision rect if obstacle has one
+					if obstacle.collisions.collisionRect.collidepoint(pointsDict[key]):
+						collidedPoints[key] = obstacle
+				except AttributeError:
+					if obstacle.rect.collidepoint(pointsDict[key]):
+						collidedPoints[key] = obstacle
 		return collidedPoints
 
 
 	def doCollision(self, collidedPoints, data):
 		"""Moves the master's rect according to which points have been collided with. Returns True if rect has moved"""
-		rect = self.master.rect
+		if self.collisionRect:
+			rect = self.collisionRect
+			self.collisionRect.center = self.master.rect.center
+		else:
+			rect = self.master.rect
+
 		for key in collidedPoints:
-			if key == 'bottom':
-				rect.bottom = collidedPoints[key].rect.top
+
+			try: # use collision rect if entity has one
+				if collidedPoints[key].collisions.collisionRect:
+					collidedRect = collidedPoints[key].collisions.collisionRect
+				else:
+					collidedRect = collidedPoints[key].rect
+			except AttributeError:
+				collidedRect = collidedPoints[key].rect
+
+			if key in ['bottomC', 'bottomL', 'bottomR']:
+				rect.bottom = collidedRect.top
 				self.master.isOnGround = True
 				self.master.yVel = 0
 			elif key == 'top':
-				rect.top = collidedPoints[key].rect.bottom
+				rect.top = collidedRect.bottom
 				self.master.yVel = 0 # hit head against the ceiling
 			elif key in ['topleft', 'bottomleft']:
-				rect.left = collidedPoints[key].rect.right
+				rect.left = collidedRect.right
 			elif key in ['topright', 'bottomright']:
-				rect.right = collidedPoints[key].rect.left
+				rect.right = collidedRect.left
+
+		self.master.rect.center = rect.center
 
 
 	def checkIfBeingPushed(self, entitiesToBePushedBy, data):
 		"""Checks whether 4 collision points collide with the entities to be pushed by, and if so move the entity's rect."""
-		rect = self.master.rect
+		if self.collisionRect:
+			rect = self.collisionRect
+			self.collisionRect.center = self.master.rect.center
+		else:
+			rect = self.master.rect
+
 		collisionPoints = {'topleft': (rect.left, rect.top + 10), 'bottomleft': (rect.left, rect.bottom - 10),
 						   'topright': (rect.right, rect.top + 10), 'bottomright': (rect.right, rect.bottom - 10)} # points to check collision
 
@@ -83,19 +116,25 @@ class CollisionComponent:
 
 
 	def checkIfStandingOn(self, entitiesToStandOn, data):
-		rect = self.master.rect
-		collisionPoints = {'bottom': rect.midbottom}
+		if self.collisionRect:
+			rect = self.collisionRect
+			self.collisionRect.center = self.master.rect.center
+		else:
+			rect = self.master.rect
+		collisionPoints = {'bottomC': (rect.midbottom),
+						   'bottomL': (rect.left + 20, rect.bottom), 'bottomR': (rect.right - 20, rect.bottom)}
 		# collidedPoints will be a dict with format {collisionPointName: entityCollided}
 		collidedPoints = self.checkCollisionPoints(data, collisionPoints, entitiesToStandOn)
 		self.doCollision(collidedPoints, data)
-		if collidedPoints:
-			self.wasStandingOn = collidedPoints['bottom']
+		for point in collidedPoints:
+			if point:
+				self.wasStandingOn = point
 
 
 
 class GravityComponent:
 	"""A component which will update its master's y velocity and rect's y coordinates"""
-	gravity = 600
+	gravity = 800
 	terminalVelocity = 400
 	def __init__(self, master):
 		self.master = master
@@ -158,7 +197,6 @@ class EnchantmentComponent:
 								self.soulBoundOffset = self.getRectOffset(self.master.rect, self.soulBound.rect)
 								self.soulBound.enchantments.soulBoundOffset = self.getRectOffset(self.soulBound.rect, self.master.rect)
 								self.master.rect.move_ip(-1, 0)
-								print str(self.soulBoundOffset)
 								break
 
 					if self.soulBound.yVel != 0:
@@ -192,3 +230,86 @@ class EnchantmentComponent:
 			self.soulBound.enchantments.removeSoulBind(False)
 		self.soulBound = None
 		self.isSoulBinder = False
+
+
+
+class AnimationComponent:
+	"""A component which handles animations for an entity"""
+	def __init__(self, master, animsDict):
+		"""animsDict has format {'name': {'spritesheet': ..., 'imageWidth': ..., 'timePerFrame': ..., 'flip': ...}}"""
+		self.master = master
+
+		for key in animsDict:
+			animsDict[key]['spritesheet'].convert_alpha()
+
+		self.framesDict = {}
+		self.secsPerFrameDict = {}
+
+		for key in animsDict:
+			if animsDict[key]['flip']:
+				a, b = self.snipSpritesheet(animsDict[key]['spritesheet'], animsDict[key]['imageWidth'], animsDict[key]['flip'])
+				self.framesDict[key + 'R'] = a
+				self.framesDict[key + 'L'] = b
+
+				self.secsPerFrameDict[key + 'R'] = self.secsPerFrameDict[key + 'L'] = animsDict[key]['timePerFrame']
+
+			else: 	# do not flip
+				a = self.snipSpritesheet(animsDict[key]['spritesheet'], animsDict[key]['imageWidth'], animsDict[key]['flip'])
+				self.framesDict[key] = a
+
+		self.animName = None
+		self.lastAnimTime = time.time()
+		self.frame = 0
+		self.nextAnim = None
+
+
+	def snipSpritesheet(self, sheet, imgWidth, flip):
+		"""Returns a list of frames in the spritesheet. If flip=True it also returns a list of x-flipped frames"""
+		frames = []
+		flippedFrames = []
+
+		for x in range(0, sheet.get_width(), imgWidth):
+			frameRect = pygame.Rect((x, 0), (imgWidth, sheet.get_height()))
+			frames.append(sheet.subsurface(frameRect))
+
+			if flip:
+				flippedFrames.append(pygame.transform.flip(sheet.subsurface(frameRect), 1, 0))
+
+		return (frames, flippedFrames)
+
+
+	def play(self, animName):
+		"""Starts the selected animation playing"""
+		if self.animName != animName:
+			self.animName = animName
+			self.lastAnimTime = 0
+			self.frame = -1
+
+
+	def playOnce(self, animName, playNext=None):
+		"""Start the selected animation then reverts to playNext or previous anim when finished"""
+		if not playNext: # play previous anim
+			self.nextAnim = self.animName
+		else:
+			self.nextAnim = playNext
+
+		self.animName = animName
+		self.lastAnimTime = 0
+		self.frame = -1
+
+
+	def update(self):
+		"""Update master.image with the correct frame of the animation"""
+		if time.time() - self.lastAnimTime > self.secsPerFrameDict[self.animName]:
+			# UPDATE IMAGE AND FRAME
+			self.frame += 1
+			if self.frame >= len(self.framesDict[self.animName]):
+				if self.nextAnim: # has played anim once, must revert to prev anim
+					self.play(self.nextAnim)
+					self.nextAnim = None
+				
+				self.frame = 0
+
+			self.master.image = self.framesDict[self.animName][self.frame]
+
+			self.lastAnimTime = time.time()

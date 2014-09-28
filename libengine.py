@@ -38,7 +38,7 @@ class StateHandler:
 class Data:
 	"""stores variables to be accessed in many parts of the game"""
 	def __init__(self):
-		self.WINDOWWIDTH, self.WINDOWHEIGHT = (1200, 800)
+		self.WINDOWWIDTH, self.WINDOWHEIGHT = (1920, 800)
 		self.screen = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT))
 		self.gameSurf = pygame.Surface(self.screen.get_size())
 		self.gameSurf.convert()
@@ -50,7 +50,7 @@ class Data:
 		self.input = input.Input()
 		self.currentLevel = 0 # TEMP FOR TESTING should normally be = 0
 
-		self.CELLSIZE = 32
+		self.CELLSIZE = 64
 
 		self.keybinds = {'left': [K_LEFT, K_a], 'right': [K_RIGHT, K_d],
 						 'jump': [K_SPACE, K_UP, K_w]}

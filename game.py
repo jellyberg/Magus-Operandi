@@ -14,7 +14,7 @@ class GameHandler:
 	def update(self, data):
 		data.gameMousePos = (data.input.mousePos[0] - data.gameRect.left, data.input.mousePos[1] - data.gameRect.top)
 
-		data.gameSurf.fill((50, 50, 50))
+		data.gameSurf.fill((170, 192, 171))
 
 		for player in data.playerGroup:
 			player.update(data)
