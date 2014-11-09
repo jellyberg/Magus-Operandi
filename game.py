@@ -51,8 +51,8 @@ class GameHandler:
 		"""Load a level from a .txt file in the folder assets/levels"""
 		data.screen.fill((20, 20, 20))
 		# TEMP
-		platformSurf = pygame.Surface((data.CELLSIZE, data.CELLSIZE))
-		platformSurf.fill((50, 200, 60))
+		platformSurf = pygame.image.load('assets/objects/platform.png')
+		platformSurf.convert_alpha()
 
 		level = open('assets/levels/' + filename + '.txt', 'r')
 		x = y = 0
