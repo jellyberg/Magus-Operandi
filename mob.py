@@ -5,7 +5,7 @@ import pygame, time
 from components import Entity, GravityComponent, CollisionComponent, AnimationComponent
 
 class Player(Entity):
-	moveSpeed = 300
+	moveSpeed = 400
 	jumpVelocity = 400
 	jumpHoldIncrease = 200
 	timeToJumpAfterLeavingGround = 0.2 # number of seconds in which the player can jump after falling off a platform
@@ -25,7 +25,7 @@ class Player(Entity):
 		self.obeysGravity = True
 		self.weight = 1
 
-		self.moveSpeedModifier = {'left': 0, 'right': 0} # a number added on to the player's moveSpeed every turn eg when pushing a crate
+		self.moveSpeedModifier = {'left': 0, 'right': 0} # a number added on to the player's moveSpeed every frame eg when pushing a crate
 
 		self.xVel = self.yVel = 0
 		self.facing = 'R'
@@ -61,14 +61,16 @@ class Player(Entity):
 		self.xVel = 0
 		for key in data.input.pressedKeys: # support for multiple keys bound to the same action
 			if key in data.keybinds['right']:
-				self.xVel += Player.moveSpeed * data.dt - self.moveSpeedModifier['right']
+				self.xVel += (Player.moveSpeed + self.moveSpeedModifier['right']) * data.dt
 				self.facing = 'R'
+				self.animation.switchDirection('R')
 				if self.isOnGround:
 					self.animation.play('runR')
 				break
 			if key in data.keybinds['left']:
-				self.xVel -= Player.moveSpeed * data.dt - self.moveSpeedModifier['left']
+				self.xVel -= (Player.moveSpeed + self.moveSpeedModifier['left']) * data.dt
 				self.facing = 'L'
+				self.animation.switchDirection('L')
 				if self.isOnGround:
 					self.animation.play('runL')
 				break
@@ -93,5 +95,5 @@ class Player(Entity):
 			if key in data.input.unpressedKeys:
 				self.releasedJumpButton = True
 
-		self.rect.move_ip(self.xVel, 0)
+		self.rect.move_ip(round(self.xVel), 0)
 		self.moveSpeedModifier['right'] = self.moveSpeedModifier['left'] = 0

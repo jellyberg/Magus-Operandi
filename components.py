@@ -15,7 +15,7 @@ class Entity(pygame.sprite.Sprite):
 class CollisionComponent:
 	"""A component which will check if its master entity has collided with a static entity and correct its rect's position.
 	This component should only be used on the dynamic/movable entities"""
-	slowdownWhilePushing = 5 # slow the mob pushing this entity by x
+	slowdownWhilePushing = -500 # slow the mob pushing this entity by x
 	def __init__(self, master, collisionRect=None):
 		"""collisionRect can be a different sized rect to the rendering rect for more accurate collision detection"""
 		self.master = master
@@ -122,7 +122,7 @@ class CollisionComponent:
 		else:
 			rect = self.master.rect
 		collisionPoints = {'bottomC': (rect.midbottom),
-						   'bottomL': (rect.left + 20, rect.bottom), 'bottomR': (rect.right - 20, rect.bottom)}
+						   'bottomL': (rect.left + 30, rect.bottom), 'bottomR': (rect.right - 30, rect.bottom)}
 		# collidedPoints will be a dict with format {collisionPointName: entityCollided}
 		collidedPoints = self.checkCollisionPoints(data, collisionPoints, entitiesToStandOn)
 		self.doCollision(collidedPoints, data)
@@ -147,12 +147,12 @@ class GravityComponent:
 			if self.master.yVel > GravityComponent.terminalVelocity:
 				self.master.yVel = GravityComponent.terminalVelocity
 
-			self.master.rect.y += math.ceil(self.master.yVel * data.dt) * self.master.weight
+			
 			if self.master in data.dynamicObjects:
 				self.master.movedThisFrame = True
 
-		if self.master.yVel < 0:
-			self.master.rect.y += self.master.yVel * data.dt * self.master.weight
+		if self.master.yVel != 0:
+			self.master.rect.y += math.ceil(self.master.yVel * data.dt) * self.master.weight
 
 
 
@@ -296,6 +296,17 @@ class AnimationComponent:
 		self.animName = animName
 		self.lastAnimTime = 0
 		self.frame = -1
+
+
+	def switchDirection(self, direction):
+		"""Changes the direction of the current animation to direction. Must have same number of frames"""
+		assert direction in ('R', 'L'), 'switchDirection direction must be R or L.'
+		if self.animName[-1] in ('R', 'L'):
+			self.animName = self.animName[:-1]
+			self.animName += direction
+		if self.nextAnim and self.nextAnim[-1] in ('R', 'L'):
+			self.nextAnim = self.nextAnim[:-1]
+			self.nextAnim += direction
 
 
 	def update(self):

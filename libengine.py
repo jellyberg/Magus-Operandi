@@ -4,6 +4,8 @@
 import pygame, input, game
 from pygame.locals import *
 
+WINDOWEDMODE = True
+
 def run():
 	stateHandler = StateHandler()
 	while True:
@@ -38,8 +40,13 @@ class StateHandler:
 class Data:
 	"""stores variables to be accessed in many parts of the game"""
 	def __init__(self):
-		self.WINDOWWIDTH, self.WINDOWHEIGHT = (1920, 1080)
-		self.screen = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT), FULLSCREEN)
+		if not WINDOWEDMODE:
+			screenInfo = pygame.display.Info()
+			self.WINDOWWIDTH, self.WINDOWHEIGHT = (screenInfo.current_w, screenInfo.current_h)
+			self.screen = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT), FULLSCREEN)
+		if WINDOWEDMODE:
+			self.WINDOWWIDTH, self.WINDOWHEIGHT = (1450, 1050)
+			self.screen = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT))
 		self.gameSurf = pygame.Surface(self.screen.get_size())
 		self.gameSurf.convert()
 

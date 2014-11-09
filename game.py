@@ -22,7 +22,9 @@ class GameHandler:
 		for dynObject in data.dynamicObjects:
 			dynObject.update(data)
 
-		data.entities.draw(data.gameSurf)
+		data.staticObjects.draw(data.gameSurf)
+		data.dynamicObjects.draw(data.gameSurf)
+		data.playerGroup.draw(data.gameSurf)
 
 		if data.spellTargeter:
 			for targeter in data.spellTargeter: # there is only one but this a workaround to get the return value
