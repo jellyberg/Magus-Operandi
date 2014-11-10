@@ -161,6 +161,7 @@ class TilePicker:
 				(i * CELLSIZE, 0), (i * CELLSIZE, self.rect.height))
 
 		self.surf = pygame.Surface(self.overlay.get_size())
+		self.surf.set_alpha(200)
 
 		self.selectedImg = pygame.Surface((CELLSIZE, CELLSIZE))
 		self.selectedImg.fill((100, 100, 255))

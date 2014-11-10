@@ -1,12 +1,12 @@
 #
 # a game by Adam Binks
 
-import pygame
+import pygame, pickle
 from object import Platform, Exit, Crate, Balloon, Key, Lock
 from mob import Player
 
 class GameHandler:
-	levelFileNames = ['introducingKeys', 'testLevel', 'testLevel2']
+	levelFileNames = ['introducing keys']
 	def __init__(self, data):
 		self.loadLevelFile(GameHandler.levelFileNames[data.currentLevel], data)
 
@@ -48,13 +48,14 @@ class GameHandler:
 
 
 	def loadLevelFile(self, filename, data):
-		"""Load a level from a .txt file in the folder assets/levels"""
+		"""Load a level from a .pickle file in the folder assets/levels"""
 		data.screen.fill((20, 20, 20))
 		# TEMP
 		platformSurf = pygame.image.load('assets/objects/platform.png')
 		platformSurf.convert_alpha()
 
-		level = open('assets/levels/' + filename + '.txt', 'r')
+		with open('assets/levels/%s.pickle' %(filename), 'rb') as handle:
+			level = pickle.load(handle)
 		x = y = 0
 		longestRowLength = 0
 		levelHeight = 0
@@ -64,27 +65,26 @@ class GameHandler:
 			levelHeight += 1
 
 			if len(row) > longestRowLength: # UPDATE LONGEST ROW
-				longestRowLength = len(row) - 1
+				longestRowLength = len(row)
 
-			for col in row:
-				col = col.upper()
-				if col == "P":
+			for tile in row:
+				if 'platform' in tile:
 					Platform((x, y), platformSurf, data)
-				if col == 'E':
+				if tile == 'exit':
 					Exit((x, y), data)
-				if col == 'C':
+				if tile == 'crate':
 					Crate((x, y), data)
-				if col == 'B':
+				if tile == 'balloon':
 					Balloon((x, y), data)
-				if col == 'K':
+				if tile == 'key':
 					Key((x, y), data)
-				if col == 'L':
+				if tile == 'lock':
 					Lock((x, y), data)
-				if col == '*':
+				if tile == 'playerSpawn':
 					Player((x, y), data)
-				x += data.CELLSIZE
-			y += data.CELLSIZE
-			x = 0
+				y += data.CELLSIZE
+			x += data.CELLSIZE
+			y = 0
 
 		data.levelWidth = longestRowLength * data.CELLSIZE
 		data.levelHeight = levelHeight * data.CELLSIZE
