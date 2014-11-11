@@ -52,8 +52,7 @@ class DynamicObject(Entity):
 class Platform(StaticObject):
 	"""A simple static platform"""
 	def __init__(self, topleft, image, data):
-		rect = image.get_rect()
-		rect.topleft = topleft
+		rect = image.get_rect(topleft = topleft)
 
 		StaticObject.__init__(self, rect, image, data)
 		self.add(data.platforms)
@@ -63,9 +62,8 @@ class Platform(StaticObject):
 class Lock(StaticObject):
 	"""A static platform that disappears when it collides with a key"""
 	image = pygame.image.load('assets/objects/lock.png')
-	def __init__(self, topleft, data):
-		rect = Lock.image.get_rect()
-		rect.topleft = topleft
+	def __init__(self, midbottom, data):
+		rect = Lock.image.get_rect(midbottom = midbottom)
 
 		self.image = Lock.image.convert()
 		StaticObject.__init__(self, rect, self.image, data)
@@ -78,16 +76,12 @@ class Lock(StaticObject):
 
 
 
-class Exit(Entity):
+class Exit(StaticObject):
 	"""When the player touches an exit the next level is loaded"""
-	image = pygame.Surface((32, 32))
-	image.fill((220, 180, 220))
-	def __init__(self, topleft, data):
-		Entity.__init__(self, data)
+	def __init__(self, midbottom, data):
+		self.rect = Exit.image.get_rect(midbottom = midbottom)
+		StaticObject.__init__(self, self.rect, Exit.image, data)
 		self.add(data.exits)
-		self.rect = Exit.image.get_rect()
-		self.rect.topleft = topleft
-		self.image = Exit.image
 
 
 
@@ -100,9 +94,8 @@ class Exit(Entity):
 class Crate(DynamicObject):
 	"""A simple pushable crate, obeys gravity"""
 	image = pygame.image.load('assets/objects/crate.png')
-	def __init__(self, topleft, data):
-		rect = Crate.image.get_rect()
-		rect.topleft = topleft
+	def __init__(self, midbottom, data):
+		rect = Crate.image.get_rect(midbottom = midbottom)
 		Crate.image.convert()
 		DynamicObject.__init__(self, rect, self.image, data, 'PUSHABLE')
 		self.add(data.crates)
@@ -113,9 +106,8 @@ class Crate(DynamicObject):
 class Balloon(DynamicObject):
 	"""A non pushable balloon that floats upwards"""
 	image = pygame.image.load('assets/objects/balloon.png')
-	def __init__(self, topleft, data):
-		rect = Balloon.image.get_rect()
-		rect.topleft = topleft
+	def __init__(self, midbottom, data):
+		rect = Balloon.image.get_rect(midbottom = midbottom)
 		Balloon.image.convert()
 		DynamicObject.__init__(self, rect, self.image, data, 1) # not pushable
 		self.add(data.balloons)
@@ -125,9 +117,8 @@ class Balloon(DynamicObject):
 class Key(DynamicObject):
 	"""A pushable key that opens doors (and is consumed in the process) when it is near them"""
 	image = pygame.image.load('assets/objects/key.png')
-	def __init__(self, topleft, data):
-		rect = Key.image.get_rect()
-		rect.topleft = topleft
+	def __init__(self, midbottom, data):
+		rect = Key.image.get_rect(midbottom = midbottom)
 		Key.image.convert()
 		DynamicObject.__init__(self, rect, self.image, data, 'pushable')
 		self.add(data.keys)

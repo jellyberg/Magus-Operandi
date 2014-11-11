@@ -6,7 +6,7 @@ from object import Platform, Exit, Crate, Balloon, Key, Lock
 from mob import Player
 
 class GameHandler:
-	levelFileNames = ['introducing keys']
+	levelFileNames = ['introducing keys', 'test level']
 	def __init__(self, data):
 		self.loadLevelFile(GameHandler.levelFileNames[data.currentLevel], data)
 
@@ -54,40 +54,35 @@ class GameHandler:
 		platformSurf = pygame.image.load('assets/objects/platform.png')
 		platformSurf.convert_alpha()
 
+		Exit.image = pygame.image.load('assets/objects/exit.png')
+
 		with open('assets/levels/%s.pickle' %(filename), 'rb') as handle:
 			level = pickle.load(handle)
 		x = y = 0
-		longestRowLength = 0
-		levelHeight = 0
 
 		# build the level
 		for row in level:
-			levelHeight += 1
-
-			if len(row) > longestRowLength: # UPDATE LONGEST ROW
-				longestRowLength = len(row)
-
 			for tile in row:
 				if 'platform' in tile:
 					Platform((x, y), platformSurf, data)
 				if tile == 'exit':
-					Exit((x, y), data)
+					Exit((x + data.CELLSIZE / 2, y + data.CELLSIZE - 1), data)   # place objects at the midbottom of the cell
 				if tile == 'crate':
-					Crate((x, y), data)
+					Crate((x + data.CELLSIZE / 2, y + data.CELLSIZE - 1), data)
 				if tile == 'balloon':
-					Balloon((x, y), data)
+					Balloon((x + data.CELLSIZE / 2, y + data.CELLSIZE - 1), data)
 				if tile == 'key':
-					Key((x, y), data)
+					Key((x + data.CELLSIZE / 2, y + data.CELLSIZE - 1), data)
 				if tile == 'lock':
-					Lock((x, y), data)
+					Lock((x + data.CELLSIZE / 2, y + data.CELLSIZE - 1), data)
 				if tile == 'playerSpawn':
 					Player((x, y), data)
 				y += data.CELLSIZE
 			x += data.CELLSIZE
 			y = 0
 
-		data.levelWidth = longestRowLength * data.CELLSIZE
-		data.levelHeight = levelHeight * data.CELLSIZE
+		data.levelWidth = len(level) * data.CELLSIZE
+		data.levelHeight = len(level[0]) * data.CELLSIZE
 
 		data.gameSurf = pygame.Surface((data.levelWidth, data.levelHeight))
 		data.gameSurf.convert()
