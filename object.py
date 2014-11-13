@@ -82,6 +82,7 @@ class Exit(StaticObject):
 		self.rect = Exit.image.get_rect(midbottom = midbottom)
 		StaticObject.__init__(self, self.rect, Exit.image, data)
 		self.add(data.exits)
+		self.remove(data.worldGeometry)
 
 
 

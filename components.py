@@ -24,8 +24,9 @@ class CollisionComponent:
 		self.collisionRect = collisionRect
 
 
-	def checkForWorldCollisions(self, data):
-		"""Checks whether 9 collision points collide with the world geometry, and if so move the entity's rect"""
+	def checkForWorldCollisions(self, data, useExtraAccuracy=False):
+		"""
+		Checks whether 9 collision points collide with the world geometry, and if so move the entity's rect"""
 		if self.collisionRect:
 			rect = self.collisionRect
 			self.collisionRect.center = self.master.rect.center
@@ -108,11 +109,18 @@ class CollisionComponent:
 		# if applicable, slow the pusher's movespeed by slowdownWhilePushing while pushing
 		for key in collidedPoints:
 			self.master.movedThisFrame = True
-			if hasattr(collidedPoints[key], 'moveSpeedModifier'):
+			pusher = collidedPoints[key]
+
+			if hasattr(pusher, 'moveSpeedModifier'):
 				if key in ['topright', 'bottomright']:
-					collidedPoints[key].moveSpeedModifier['left'] = CollisionComponent.slowdownWhilePushing
+					pusher.moveSpeedModifier['left'] = CollisionComponent.slowdownWhilePushing
 				if key in ['topleft', 'bottomleft']:
-					collidedPoints[key].moveSpeedModifier['right'] = CollisionComponent.slowdownWhilePushing
+					pusher.moveSpeedModifier['right'] = CollisionComponent.slowdownWhilePushing
+
+			
+			if hasattr(pusher, 'animation'):
+				if pusher.movedThisFrame:
+					pusher.animation.play('push' + pusher.facing)
 
 
 	def checkIfStandingOn(self, entitiesToStandOn, data):
@@ -139,6 +147,7 @@ class GravityComponent:
 	def __init__(self, master):
 		self.master = master
 		self.master.yVel = 0
+		self.master.isOnGround = False
 
 
 	def update(self, data):
@@ -236,7 +245,7 @@ class EnchantmentComponent:
 class AnimationComponent:
 	"""A component which handles animations for an entity"""
 	def __init__(self, master, animsDict):
-		"""animsDict has format {'name': {'spritesheet': ..., 'imageWidth': ..., 'timePerFrame': ..., 'flip': ...}}"""
+		"""animsDict has format {'name': {'spritesheet': [Surface], 'imageWidth': [int], 'timePerFrame': [float], 'flip': [bool]}}"""
 		self.master = master
 
 		for key in animsDict:
@@ -269,6 +278,8 @@ class AnimationComponent:
 		flippedFrames = []
 
 		for x in range(0, sheet.get_width(), imgWidth):
+			if x + imgWidth > sheet.get_width():
+				break
 			frameRect = pygame.Rect((x, 0), (imgWidth, sheet.get_height()))
 			frames.append(sheet.subsurface(frameRect))
 
@@ -280,7 +291,7 @@ class AnimationComponent:
 
 	def play(self, animName):
 		"""Starts the selected animation playing"""
-		if self.animName != animName:
+		if self.animName != animName: # self.animName and self.animName not in animName:  # only if animName is not previous animName L or R
 			self.animName = animName
 			self.lastAnimTime = 0
 			self.frame = -1
