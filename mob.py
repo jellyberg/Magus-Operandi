@@ -47,8 +47,8 @@ class Player(Entity):
 
 
 	def update(self, data):
-		for exit in data.exits:
-			if self.rect.colliderect(exit.rect):
+		for exit in data.exits:   # if touches an exit when on ground, load next level
+			if self.isOnGround and self.collisions.collisionRect.colliderect(exit.collisionRect):
 				data.gameHandler.nextLevel(data)
 				return
 

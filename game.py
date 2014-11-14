@@ -16,6 +16,10 @@ class GameHandler:
 	def update(self, data):
 		data.gameMousePos = (data.input.mousePos[0] - data.gameRect.left, data.input.mousePos[1] - data.gameRect.top)
 
+		if pygame.locals.K_r in data.input.unpressedKeys:
+			data.currentLevel -= 1
+			self.nextLevel(data)
+
 		data.gameSurf.fill((170, 192, 171))
 
 		for player in data.playerGroup:

@@ -80,6 +80,8 @@ class Exit(StaticObject):
 	"""When the player touches an exit the next level is loaded"""
 	def __init__(self, midbottom, data):
 		self.rect = Exit.image.get_rect(midbottom = midbottom)
+		self.collisionRect = pygame.Rect((0, 0), (self.rect.width - 20, self.rect.height - 20))
+		self.collisionRect.midbottom = midbottom
 		StaticObject.__init__(self, self.rect, Exit.image, data)
 		self.add(data.exits)
 		self.remove(data.worldGeometry)
