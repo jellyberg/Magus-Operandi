@@ -26,7 +26,7 @@ class Player(Entity):
 
 		collisionRect = pygame.Rect((0, 0), (83, 128))
 		collisionRect.midbottom = midbottom
-		self.collisions = CollisionComponent(self, collisionRect)
+		self.collisions = CollisionComponent(self, collisionRect, True)
 		self.gravity = GravityComponent(self)
 		self.obeysGravity = True
 		self.weight = 1

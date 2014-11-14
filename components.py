@@ -16,12 +16,15 @@ class CollisionComponent:
 	"""A component which will check if its master entity has collided with a static entity and correct its rect's position.
 	This component should only be used on the dynamic/movable entities"""
 	slowdownWhilePushing = -500 # slow the mob pushing this entity by x
-	def __init__(self, master, collisionRect=None):
-		"""collisionRect can be a different sized rect to the rendering rect for more accurate collision detection"""
+	def __init__(self, master, collisionRect=None, useRectsForCollision=False):
+		"""
+		collisionRect can be a different sized rect to the rendering rect for more accurate collision detection.
+		useRectsForCollision uses rect based collision rather than point based so collision detection is more reliable."""
 		self.master = master
 		self.master.isOnGround = False
 		self.wasStandingOn = None
 		self.collisionRect = collisionRect
+		self.useRectsForCollision = useRectsForCollision
 
 
 	def checkForWorldCollisions(self, data, useExtraAccuracy=False):
@@ -33,13 +36,17 @@ class CollisionComponent:
 		else:
 			rect = self.master.rect
 
-		collisionPoints = {'top': (rect.midtop), 'bottomC': (rect.midbottom),
-						   'bottomL': (rect.left + 20, rect.bottom), 'bottomR': (rect.right - 20, rect.bottom),
-						   'topleft': (rect.left, rect.top + 10), 'bottomleft': (rect.left, rect.bottom - 10),
-						   'topright': (rect.right, rect.top + 10), 'bottomright': (rect.right, rect.bottom - 10)} # points to check collision
+		if self.useRectsForCollision:
+			collidedPoints = self.checkCollisionRects(data, rect, data.worldGeometry)
 
-		# collidedPoints will be a dict with format {collisionPointName: platformCollided}
-		collidedPoints = self.checkCollisionPoints(data, collisionPoints, data.worldGeometry)
+		else:  # use points
+			collisionPoints = {'top': (rect.midtop), 'bottomC': (rect.midbottom), # points to check collision
+							   'bottomL': (rect.left + 20, rect.bottom), 'bottomR': (rect.right - 20, rect.bottom),
+							   'topleft': (rect.left, rect.top + 10), 'bottomleft': (rect.left, rect.bottom - 10),
+							   'topright': (rect.right, rect.top + 10), 'bottomright': (rect.right, rect.bottom - 10)}
+			# collidedPoints will be a dict with format {collisionPointName: platformCollided}
+			collidedPoints = self.checkCollisionPoints(data, collisionPoints, data.worldGeometry)
+
 		self.master.isOnGround = False # assume not on ground
 		self.doCollision(collidedPoints, data)
 
@@ -56,6 +63,32 @@ class CollisionComponent:
 					if obstacle.rect.collidepoint(pointsDict[key]):
 						collidedPoints[key] = obstacle
 		return collidedPoints
+
+
+	def checkCollisionRects(self, data, rect, groupToCollide):
+		"""Checks whether 4 areas of the passed rect collides with a rect of any of the passed group"""
+		margin = rect.height / 5
+
+		quadrants      = {'top': pygame.Rect((rect.left + margin, rect.top),
+											 (rect.width - margin*2, rect.height / 4)),
+						  'bottom': pygame.Rect((rect.left + margin, rect.bottom - rect.height / 4),
+						  					    (rect.width - margin*2, rect.height / 4)),
+						  'left': pygame.Rect((rect.left, rect.top + margin), 
+						  					 (rect.width / 4, rect.height - margin*2)),
+						  'right': pygame.Rect((rect.right - rect.width / 4, rect.top + margin), 
+						  					   (rect.width / 4, rect.height - margin*2))}
+
+		collidedRects = {}
+		for obstacle in groupToCollide:
+			for key in quadrants:
+				try:  # use collision rect if obstacle has one
+					if obstacle.collisions.collisionRect.colliderect(quadrants[key]):
+						collidedRects[key] = obstacle
+				except AttributeError:
+					if obstacle.rect.colliderect(quadrants[key]):
+						collidedRects[key] = obstacle
+
+		return collidedRects
 
 
 	def doCollision(self, collidedPoints, data):
@@ -76,16 +109,16 @@ class CollisionComponent:
 			except AttributeError:
 				collidedRect = collidedPoints[key].rect
 
-			if key in ['bottomC', 'bottomL', 'bottomR']:
+			if key in ['bottomC', 'bottomL', 'bottomR', 'bottom']:
 				rect.bottom = collidedRect.top
 				self.master.isOnGround = True
 				self.master.yVel = 0
 			elif key == 'top':
 				rect.top = collidedRect.bottom
 				self.master.yVel = 0 # hit head against the ceiling
-			elif key in ['topleft', 'bottomleft']:
+			elif key in ['topleft', 'bottomleft', 'left']:
 				rect.left = collidedRect.right
-			elif key in ['topright', 'bottomright']:
+			elif key in ['topright', 'bottomright', 'right']:
 				rect.right = collidedRect.left
 
 		self.master.rect.center = rect.center
