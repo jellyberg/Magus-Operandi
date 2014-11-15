@@ -20,9 +20,9 @@ class Player(Entity):
 													'jump': {'spritesheet': pygame.image.load('assets/mobs/player/jump.png'),
 														   'imageWidth': 128, 'timePerFrame': 0.1, 'flip': True},
 													'idle': {'spritesheet': pygame.image.load('assets/mobs/player/idle.png'),
-														   'imageWidth': 128, 'timePerFrame': 0.1, 'flip': True},
+														   'imageWidth': 128, 'timePerFrame': 0.15, 'flip': True},
 													'cast': {'spritesheet': pygame.image.load('assets/mobs/player/cast.png'),
-														   'imageWidth': 128, 'timePerFrame': 0.12, 'flip': True},
+														   'imageWidth': 128, 'timePerFrame': 0.18, 'flip': True},
 													'push': {'spritesheet': pygame.image.load('assets/mobs/player/push.png'),
 														   'imageWidth': 128, 'timePerFrame': 0.1, 'flip': True}})
 
@@ -48,6 +48,9 @@ class Player(Entity):
 
 		self.rect = self.image.get_rect(midbottom = midbottom)
 
+		self.pullRect = pygame.Rect((0, 0), (40, self.rect.height))
+		self.pullStartFacing = None
+
 
 	def update(self, data):
 		for exit in data.exits:   # if touches an exit when on ground, load next level
@@ -57,6 +60,7 @@ class Player(Entity):
 
 		if not data.spellTargeter:
 			self.move(data)
+			self.pull(data)
 		if data.spellTargeter:
 			self.animation.play('cast' + self.facing)
 		if 'cast' in self.animation.animName:
@@ -125,3 +129,31 @@ class Player(Entity):
 
 		self.rect.move_ip(round(self.xVel), 0)
 		self.moveSpeedModifier['right'] = self.moveSpeedModifier['left'] = 0
+
+
+	def pull(self, data):
+		"""Pulls any pushable objects within range of the player"""
+		keyIsPressed = False
+		for key in data.keybinds['pull']:
+			if key in data.input.pressedKeys:
+				keyIsPressed = True
+				if not self.pullStartFacing:
+					self.pullStartFacing = self.facing
+				break
+
+		if keyIsPressed:
+			if self.pullStartFacing == 'R':
+				self.pullRect.topleft = self.collisions.collisionRect.topright
+			elif self.pullStartFacing == 'L':
+				self.pullRect.topright = self.collisions.collisionRect.topleft
+
+			for obj in data.dynamicObjects:
+				if obj.rect.colliderect(self.pullRect):
+					if self.pullStartFacing == 'R':
+						obj.rect.left = self.collisions.collisionRect.right
+					if self.pullStartFacing == 'L':
+						obj.rect.right = self.collisions.collisionRect.left
+					break
+
+		if not keyIsPressed:
+			self.pullStartFacing = None

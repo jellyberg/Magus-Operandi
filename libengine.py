@@ -60,7 +60,7 @@ class Data:
 		self.CELLSIZE = 64
 
 		self.keybinds = {'left': [K_LEFT, K_a], 'right': [K_RIGHT, K_d],
-						 'jump': [K_SPACE, K_UP, K_w]}
+						 'jump': [K_SPACE, K_UP, K_w], 'pull': [K_LSHIFT, K_LCTRL]}
 
 		self.WHITE     = (255, 255, 255)
 		self.BLACK     = (  0,   0,   0)
