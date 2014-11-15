@@ -21,6 +21,8 @@ class Player(Entity):
 														   'imageWidth': 128, 'timePerFrame': 0.1, 'flip': True},
 													'idle': {'spritesheet': pygame.image.load('assets/mobs/player/idle.png'),
 														   'imageWidth': 128, 'timePerFrame': 0.1, 'flip': True},
+													'cast': {'spritesheet': pygame.image.load('assets/mobs/player/cast.png'),
+														   'imageWidth': 128, 'timePerFrame': 0.12, 'flip': True},
 													'push': {'spritesheet': pygame.image.load('assets/mobs/player/push.png'),
 														   'imageWidth': 128, 'timePerFrame': 0.1, 'flip': True}})
 
@@ -32,7 +34,8 @@ class Player(Entity):
 		self.weight = 1
 		self.movedThisFrame = False
 
-		self.moveSpeedModifier = {'left': 0, 'right': 0} # a number added on to the player's moveSpeed every frame eg when pushing a crate
+		self.moveSpeedModifier = {'left': 0, 'right': 0} # a number added on to the player's moveSpeed every frame
+														 # eg when pushing a crate
 
 		self.xVel = self.yVel = 0
 		self.facing = 'R'
@@ -52,7 +55,20 @@ class Player(Entity):
 				data.gameHandler.nextLevel(data)
 				return
 
-		self.move(data)
+		if not data.spellTargeter:
+			self.move(data)
+		if data.spellTargeter:
+			self.animation.play('cast' + self.facing)
+		if 'cast' in self.animation.animName:
+			if data.gameMousePos[0] < self.rect.centerx:
+				self.facing = 'L'
+			else:
+				self.facing  = 'R'
+			self.animation.switchDirection(self.facing)
+
+			if not data.spellTargeter:
+				self.animation.play('idle' + self.facing)
+
 		self.gravity.update(data)
 		self.collisions.checkForWorldCollisions(data)
 		self.collisions.checkIfStandingOn(data.dynamicObjects, data)
