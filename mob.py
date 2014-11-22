@@ -15,18 +15,20 @@ class Player(Entity):
 		self.add(data.playerGroup)
 		self.add(data.mobs)
 
-		self.animation = AnimationComponent(self, { 'run': {'spritesheet': pygame.image.load('assets/mobs/player/run.png'),
-														   'imageWidth': 128, 'timePerFrame': 0.06, 'flip': True},
-													'jump': {'spritesheet': pygame.image.load('assets/mobs/player/jump.png'),
-														   'imageWidth': 128, 'timePerFrame': 0.1, 'flip': True},
-													'idle': {'spritesheet': pygame.image.load('assets/mobs/player/idle.png'),
-														   'imageWidth': 128, 'timePerFrame': 0.15, 'flip': True},
-													'cast': {'spritesheet': pygame.image.load('assets/mobs/player/cast.png'),
-														   'imageWidth': 128, 'timePerFrame': 0.18, 'flip': True},
-													'push': {'spritesheet': pygame.image.load('assets/mobs/player/push.png'),
-														   'imageWidth': 128, 'timePerFrame': 0.1, 'flip': True}})
+		colourDict = {(206, 209, 138): (206, 138, 138),  # robe
+					  (170, 192, 171): (191, 170, 170), #shoes and hat
+					  (206, 201, 175): (204, 184, 173), # skin
+					  (233, 234, 232): (233, 234, 232)} # moustache
 
-		collisionRect = pygame.Rect((0, 0), (83, 128))
+		animImages = {}
+		for animName in ['run', 'jump', 'idle', 'cast', 'push', 'pull']:
+			animImages[animName] = pygame.image.load('assets/mobs/player/%s.png' %(animName))
+		animImages = self.setColours(colourDict, animImages)
+		self.initAnimations(animImages)
+
+		
+
+		collisionRect = pygame.Rect((0, 0), (83, 120))
 		collisionRect.midbottom = midbottom
 		self.collisions = CollisionComponent(self, collisionRect, True)
 		self.gravity = GravityComponent(self)
@@ -50,6 +52,22 @@ class Player(Entity):
 
 		self.pullRect = pygame.Rect((0, 0), (40, self.rect.height))
 		self.pullStartFacing = None
+		self.isPulling = False
+
+
+	def initAnimations(self, animImages, currentAnim=None):
+		self.animation = AnimationComponent(self, { 'run': {'spritesheet': animImages['run'],
+														   'imageWidth': 128, 'timePerFrame': 0.06, 'flip': True},
+													'jump': {'spritesheet': animImages['jump'],
+														   'imageWidth': 128, 'timePerFrame': 0.1, 'flip': True},
+													'idle': {'spritesheet': animImages['idle'],
+														   'imageWidth': 128, 'timePerFrame': 0.15, 'flip': True},
+													'cast': {'spritesheet': animImages['cast'],
+														   'imageWidth': 128, 'timePerFrame': 0.18, 'flip': True},
+													'push': {'spritesheet': animImages['push'],
+														   'imageWidth': 128, 'timePerFrame': 0.1, 'flip': True},
+													'pull': {'spritesheet': animImages['pull'],
+														   'imageWidth': 128, 'timePerFrame': 0.15, 'flip': True}})
 
 
 	def update(self, data):
@@ -60,7 +78,9 @@ class Player(Entity):
 
 		if not data.spellTargeter:
 			self.move(data)
-			self.pull(data)
+			self.isPulling = self.pull(data)
+
+		# spellcasting animation
 		if data.spellTargeter:
 			self.animation.play('cast' + self.facing)
 		if 'cast' in self.animation.animName:
@@ -104,7 +124,11 @@ class Player(Entity):
 				self.movedThisFrame = True
 				break
 
-		if not self.movedThisFrame and ('run' in self.animation.animName or 'push' in self.animation.animName):
+		if self.isPulling and self.facing != self.pullStartFacing:
+			self.animation.play('pull' + self.facing)
+
+		if not self.movedThisFrame and ('run' in self.animation.animName or 'push' in self.animation.animName\
+										or 'pull' in self.animation.animName):
 			self.animation.play('idle' + self.facing)
 
 		if self.xVel > 0:
@@ -153,7 +177,23 @@ class Player(Entity):
 						obj.rect.left = self.collisions.collisionRect.right
 					if self.pullStartFacing == 'L':
 						obj.rect.right = self.collisions.collisionRect.left
-					break
+					return 'pulling'
 
 		if not keyIsPressed:
 			self.pullStartFacing = None
+
+
+	def setColours(self, colourDict, imageDict):
+		"""Set colours of the wizard's images"""
+		modifiedImgs = {}
+		for imgName in imageDict:
+			newImage = imageDict[imgName].copy()
+			pixArray = pygame.PixelArray(newImage)
+
+			for oldColour in colourDict:
+				newColour = colourDict[oldColour]
+				pixArray.replace(oldColour, newColour)
+
+			modifiedImgs[imgName] = newImage
+
+		return modifiedImgs

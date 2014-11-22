@@ -7,7 +7,7 @@ from mob import Player
 
 class GameHandler:
 	levelFileNames = ['basic platforming', 'basic crates', 'lock and key', 'introducing keys', 'test level']
-	startLevel = 'introducing keys' # temp
+	startLevel = 'basic crates' # temp
 	def __init__(self, data):
 		data.currentLevel = GameHandler.levelFileNames.index(GameHandler.startLevel) # temp
 		self.loadLevelFile(GameHandler.levelFileNames[data.currentLevel], data)

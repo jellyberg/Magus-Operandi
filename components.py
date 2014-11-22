@@ -25,6 +25,7 @@ class CollisionComponent:
 		self.wasStandingOn = None
 		self.collisionRect = collisionRect
 		self.useRectsForCollision = useRectsForCollision
+		self.lastPusher = None
 
 
 	def checkForWorldCollisions(self, data, useExtraAccuracy=False):
@@ -140,6 +141,7 @@ class CollisionComponent:
 		self.doCollision(collidedPoints, data)
 
 		# if applicable, slow the pusher's movespeed by slowdownWhilePushing while pushing
+		pusher = None
 		for key in collidedPoints:
 			self.master.movedThisFrame = True
 			pusher = collidedPoints[key]
@@ -154,6 +156,7 @@ class CollisionComponent:
 			if hasattr(pusher, 'animation'):
 				if pusher.movedThisFrame:
 					pusher.animation.play('push' + pusher.facing)
+					self.lastPusher = pusher
 
 
 	def checkIfStandingOn(self, entitiesToStandOn, data):
