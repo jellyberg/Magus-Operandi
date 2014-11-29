@@ -15,15 +15,16 @@ class Player(Entity):
 		self.add(data.playerGroup)
 		self.add(data.mobs)
 
-		colourDict = {(206, 209, 138): (206, 138, 138),  # robe
-					  (170, 192, 171): (191, 170, 170), #shoes and hat
+		# red theme colour  - currently unused
+		colourDict = {(206, 209, 138): (206, 138, 138), # robe
+					  (170, 192, 171): (191, 170, 170), # shoes and hat
 					  (206, 201, 175): (204, 184, 173), # skin
 					  (233, 234, 232): (233, 234, 232)} # moustache
 
 		animImages = {}
-		for animName in ['run', 'jump', 'idle', 'cast', 'push', 'pull']:
+		for animName in ['run', 'jump', 'idle', 'cast', 'push', 'pull', 'grab']:
 			animImages[animName] = pygame.image.load('assets/mobs/player/%s.png' %(animName))
-		animImages = self.setColours(colourDict, animImages)
+		#animImages = self.setColours(colourDict, animImages)
 		self.initAnimations(animImages)
 
 		
@@ -67,6 +68,8 @@ class Player(Entity):
 													'push': {'spritesheet': animImages['push'],
 														   'imageWidth': 128, 'timePerFrame': 0.1, 'flip': True},
 													'pull': {'spritesheet': animImages['pull'],
+														   'imageWidth': 128, 'timePerFrame': 0.15, 'flip': True},
+													'grab': {'spritesheet': animImages['grab'],
 														   'imageWidth': 128, 'timePerFrame': 0.15, 'flip': True}})
 
 
@@ -124,12 +127,21 @@ class Player(Entity):
 				self.movedThisFrame = True
 				break
 
+		# play pull animations
 		if self.isPulling and self.facing != self.pullStartFacing:
 			self.animation.play('pull' + self.facing)
-
-		if not self.movedThisFrame and ('run' in self.animation.animName or 'push' in self.animation.animName\
-										or 'pull' in self.animation.animName):
+		elif self.isPulling and not self.movedThisFrame:
+			self.animation.play('grab' + self.facing)
+		# stop playing pull animations if not pulling
+		if ('grab' in self.animation.animName or 'pull' in self.animation.animName) and not self.isPulling:
 			self.animation.play('idle' + self.facing)
+
+		# idle animations
+		if not self.movedThisFrame:
+			if 'run' in self.animation.animName or 'push' in self.animation.animName:
+				self.animation.play('idle' + self.facing)
+			if 'pull' in self.animation.animName and self.pullStartFacing:
+				self.animation.play('grab' + self.pullStartFacing)
 
 		if self.xVel > 0:
 			self.xVel -= Player.drag * data.dt

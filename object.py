@@ -27,14 +27,16 @@ class DynamicObject(Entity):
 		self.isPushable = pushable
 		self.movedThisFrame = False
 		
-		self.collisions = CollisionComponent(self)
+		self.collisions = CollisionComponent(self, False, True)
 		self.gravity = GravityComponent(self)
 		self.enchantments = EnchantmentComponent(self)
+		self.isBeingStoodOn = False
 
 	def update(self, data):
 		self.enchantments.update(data)
 
-		self.gravity.update(data)
+		if not data.balloons or not self.isBeingStoodOn:  # balloons don't float when something is on top of them
+			self.gravity.update(data)
 
 		if self.isPushable:
 			data.dynamicObjects.remove(self)
@@ -46,6 +48,8 @@ class DynamicObject(Entity):
 		if not data.spellTargeter and data.input.mousePressed == 1 and self.rect.collidepoint(data.gameMousePos):
 			self.enchantments.removeSoulBind()
 			SpellTargeter(self, data.RED, 'soulbind', data)
+
+		self.isBeingStoodOn = False
 
 
 

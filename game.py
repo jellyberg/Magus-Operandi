@@ -6,8 +6,8 @@ from object import Platform, Exit, Crate, Balloon, Key, Lock
 from mob import Player
 
 class GameHandler:
-	levelFileNames = ['basic platforming', 'basic crates', 'lock and key', 'introducing keys', 'test level']
-	startLevel = 'basic crates' # temp
+	levelFileNames = ['basic platforming', 'basic crates', 'lock and key', 'introducing keys', 'test level', 'introducing soulbinding']
+	startLevel = 'introducing soulbinding' # 'introducing soulbinding' # temp
 	def __init__(self, data):
 		data.currentLevel = GameHandler.levelFileNames.index(GameHandler.startLevel) # temp
 		self.loadLevelFile(GameHandler.levelFileNames[data.currentLevel], data)

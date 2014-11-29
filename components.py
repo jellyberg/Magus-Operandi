@@ -173,6 +173,7 @@ class CollisionComponent:
 		for point in collidedPoints:
 			if point:
 				self.wasStandingOn = point
+				collidedPoints[point].isBeingStoodOn = True
 
 
 
@@ -220,32 +221,24 @@ class EnchantmentComponent:
 				pygame.draw.line(data.gameSurf, data.RED, self.master.rect.center, self.soulBound.rect.center, 2)
 
 			rectOffset = self.getRectOffset(self.master.rect, self.soulBound.rect)
-			if rectOffset != self.soulBoundOffset: # need to update one of the rects
-				if self.soulBound.movedThisFrame:
-					xToMove = self.soulBoundOffset[0] - rectOffset[0]
+			if rectOffset != self.soulBoundOffset and self.soulBound.movedThisFrame: # need to update one of the rects
+				xToMove = self.soulBoundOffset - rectOffset
 
-					if xToMove:
-						# MOVE BIT BY BIT UNTIL COLLIDES WITH A WALL OR REACHES THE CORRECT OFFSET
-						rect = self.master.rect
-						if xToMove > 0:
-							step = data.CELLSIZE / 3
-						else:
-							step = -(data.CELLSIZE / 3)
+				if xToMove:
+					# MOVE BIT BY BIT UNTIL COLLIDES WITH A WALL OR REACHES THE CORRECT OFFSET
+					if xToMove > 0:
+						step = self.master.rect.height / 5
+					else:
+						step = -self.master.rect.height / 5
 
-						for x in range(0, xToMove, step):
-							self.master.rect.move_ip(x, 0)
-							collidedPoints = self.master.collisions.checkCollisionPoints(data,
-								{'topleft': (rect.left, rect.top + 10), 'bottomleft': (rect.left, rect.bottom - 10),
-							   'topright': (rect.right, rect.top + 10), 'bottomright': (rect.right, rect.bottom - 10)},
-							   data.worldGeometry)
-							if collidedPoints:
-								self.soulBoundOffset = self.getRectOffset(self.master.rect, self.soulBound.rect)
-								self.soulBound.enchantments.soulBoundOffset = self.getRectOffset(self.soulBound.rect, self.master.rect)
-								self.master.rect.move_ip(-1, 0)
-								break
-
-					if self.soulBound.yVel != 0:
-						self.master.yVel = self.soulBound.yVel * 100
+					for x in range(0, xToMove, step):
+						self.master.rect.move_ip(x, 0)
+						collidedPoints = self.master.collisions.checkCollisionRects(data, self.master.rect, data.worldGeometry)
+						if collidedPoints:
+							self.soulBoundOffset = self.getRectOffset(self.master.rect, self.soulBound.rect)
+							self.soulBound.enchantments.soulBoundOffset = self.getRectOffset(self.soulBound.rect, self.master.rect)
+							self.master.rect.move_ip(-1, 0)
+							break
 
 		self.master.lastRectTopleft = self.master.rect.topleft
 		self.master.movedThisFrame = False
@@ -265,8 +258,8 @@ class EnchantmentComponent:
 
 
 	def getRectOffset(self, rect1, rect2):
-		"""Returns a tuple of the x difference and y difference of the two rects"""
-		return (rect1.left - rect2.left, rect1.top - rect2.top)
+		"""Returns the x difference of the two rects"""
+		return rect1.left - rect2.left
 
 
 	def removeSoulBind(self, isInitial=True):
