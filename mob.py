@@ -185,6 +185,7 @@ class Player(Entity):
 
 			for obj in data.dynamicObjects:
 				if obj.rect.colliderect(self.pullRect):
+					#obj.movedThisFrame = True
 					if self.pullStartFacing == 'R':
 						obj.rect.left = self.collisions.collisionRect.right
 					if self.pullStartFacing == 'L':

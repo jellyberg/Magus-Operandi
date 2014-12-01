@@ -29,8 +29,7 @@ class CollisionComponent:
 
 
 	def checkForWorldCollisions(self, data, useExtraAccuracy=False):
-		"""
-		Checks whether 9 collision points collide with the world geometry, and if so move the entity's rect"""
+		"""Checks whether 9 collision points collide with the world geometry, and if so move the entity's rect"""
 		if self.collisionRect:
 			rect = self.collisionRect
 			self.collisionRect.center = self.master.rect.center
@@ -68,7 +67,7 @@ class CollisionComponent:
 
 	def checkCollisionRects(self, data, rect, groupToCollide):
 		"""Checks whether 4 areas of the passed rect collides with a rect of any of the passed group"""
-		margin = rect.height / 5
+		margin = rect.height / 4
 
 		quadrants      = {'top': pygame.Rect((rect.left + margin, rect.top),
 											 (rect.width - margin*2, rect.height / 4)),
@@ -143,8 +142,8 @@ class CollisionComponent:
 		# if applicable, slow the pusher's movespeed by slowdownWhilePushing while pushing
 		pusher = None
 		for key in collidedPoints:
-			self.master.movedThisFrame = True
 			pusher = collidedPoints[key]
+			self.master.movedThisFrame = True
 
 			if hasattr(pusher, 'moveSpeedModifier'):
 				if key in ['topright', 'bottomright']:
@@ -157,6 +156,8 @@ class CollisionComponent:
 				if pusher.movedThisFrame:
 					pusher.animation.play('push' + pusher.facing)
 					self.lastPusher = pusher
+			else:
+				pusher.movedThisFrame = True
 
 
 	def checkIfStandingOn(self, entitiesToStandOn, data):
@@ -194,8 +195,8 @@ class GravityComponent:
 				self.master.yVel = GravityComponent.terminalVelocity
 
 			
-			if self.master in data.dynamicObjects:
-				self.master.movedThisFrame = True
+			#if self.master in data.dynamicObjects:
+			#	self.master.movedThisFrame = True
 
 		if self.master.yVel != 0:
 			self.master.rect.y += math.ceil(self.master.yVel * data.dt) * self.master.weight
@@ -240,7 +241,7 @@ class EnchantmentComponent:
 							self.master.rect.move_ip(-1, 0)
 							break
 
-		self.master.lastRectTopleft = self.master.rect.topleft
+		# self.master.lastRectTopleft = self.master.rect.topleft
 		self.master.movedThisFrame = False
 
 
@@ -253,8 +254,8 @@ class EnchantmentComponent:
 		target.enchantments.soulBound = self.master
 		self.soulBoundOffset = self.getRectOffset(self.master.rect, target.rect)
 		target.enchantments.soulBoundOffset = self.getRectOffset(target.rect, self.master.rect)
-		self.master.lastRectTopleft = self.master.rect.topleft
-		target.lastRectTopleft = target.rect.topleft
+		#self.master.lastRectTopleft = self.master.rect.topleft
+		#target.lastRectTopleft = target.rect.topleft
 
 
 	def getRectOffset(self, rect1, rect2):
