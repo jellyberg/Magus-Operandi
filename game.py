@@ -7,7 +7,7 @@ from mob import Player
 
 class GameHandler:
 	levelFileNames = ['basic platforming', 'basic crates', 'lock and key', 'introducing keys', 'test level', 'introducing soulbinding']
-	startLevel = 'introducing soulbinding' # 'introducing soulbinding' # temp
+	startLevel = 'introducing soulbinding' # temp
 	def __init__(self, data):
 		data.currentLevel = GameHandler.levelFileNames.index(GameHandler.startLevel) # temp
 		self.loadLevelFile(GameHandler.levelFileNames[data.currentLevel], data)
@@ -28,8 +28,13 @@ class GameHandler:
 		for dynObject in data.dynamicObjects:
 			dynObject.update(data)
 
-		data.staticObjects.draw(data.gameSurf)
-		data.dynamicObjects.draw(data.gameSurf)
+
+		for statObj in data.staticObjects:
+			data.drawPhysicsObject(statObj, data.gameSurf)
+		
+		for dynObj in data.dynamicObjects:
+			data.drawPhysicsObject(dynObj, data.gameSurf)
+
 		data.playerGroup.draw(data.gameSurf)
 
 		if data.spellTargeter:
@@ -42,6 +47,7 @@ class GameHandler:
 					spellRoot.enchantments.bindSoulTo(spellTarget)
 
 		data.screen.blit(data.gameSurf, data.gameRect)
+		data.world.Step(data.TIMESTEP, 10, 10)
 
 
 	def nextLevel(self, data):

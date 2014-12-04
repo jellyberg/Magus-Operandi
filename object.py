@@ -4,15 +4,24 @@
 import pygame
 from components import Entity, GravityComponent, CollisionComponent, EnchantmentComponent
 from ui import SpellTargeter
+from Box2D.b2 import *
 
 class StaticObject(Entity):
 	"""An unmovable object that forms part of the world geometry"""
-	def __init__(self, rect, image, data):
+	def __init__(self, rect, image, data, isRectangle=True):
 		Entity.__init__(self, data)
 		self.add(data.staticObjects)
 		self.add(data.worldGeometry)
 		self.image = image
 		self.rect = rect
+
+		h = rect.height / 2.0
+		w = rect.width / 2.0
+		self.body = data.world.CreateStaticBody(position=(data.pixelsToMetreCoords(rect.topleft)),
+												shape=polygonShape(box=(data.pixelsToMetresConvert((h, w)))))
+
+		print str(self.body.position)
+		print str(data.pixelsToMetresConvert((h, w)))
 
 
 
@@ -27,23 +36,30 @@ class DynamicObject(Entity):
 		self.isPushable = pushable
 		self.movedThisFrame = False
 		
-		self.collisions = CollisionComponent(self, False, True)
-		self.gravity = GravityComponent(self)
+		#self.collisions = CollisionComponent(self, False, True)
+		#self.gravity = GravityComponent(self)
 		self.enchantments = EnchantmentComponent(self)
 		self.isBeingStoodOn = False
+
+
+		h = rect.height / 2.0
+		w = rect.width / 2.0
+		self.body = data.world.CreateDynamicBody(position=(data.pixelsToMetreCoords(self.rect.topleft)), angle=0)
+		self.body.CreatePolygonFixture(box=(data.pixelsToMetresConvert((h, w))), density=1, friction=0.3)
+
 
 	def update(self, data):
 		self.enchantments.update(data)
 
-		if not data.balloons or not self.isBeingStoodOn:  # balloons don't float when something is on top of them
-			self.gravity.update(data)
+		#if not data.balloons or not self.isBeingStoodOn:  # balloons don't float when something is on top of them
+		#	self.gravity.update(data)
 
-		if self.isPushable:
-			data.dynamicObjects.remove(self)
-			self.collisions.checkIfBeingPushed(data.playerGroup.sprites() + data.dynamicObjects.sprites(), data)
-			data.dynamicObjects.add(self)
-		self.collisions.checkIfStandingOn(data.dynamicObjects, data)
-		self.collisions.checkForWorldCollisions(data)
+		#if self.isPushable:
+		#	data.dynamicObjects.remove(self)
+		#	self.collisions.checkIfBeingPushed(data.playerGroup.sprites() + data.dynamicObjects.sprites(), data)
+		#	data.dynamicObjects.add(self)
+		#self.collisions.checkIfStandingOn(data.dynamicObjects, data)
+		#self.collisions.checkForWorldCollisions(data)
 
 		if not data.spellTargeter and data.input.mousePressed == 1 and self.rect.collidepoint(data.gameMousePos):
 			self.enchantments.removeSoulBind()

@@ -3,6 +3,7 @@
 
 import pygame, input, game
 from pygame.locals import *
+from Box2D.b2 import *
 
 WINDOWEDMODE = True
 
@@ -55,12 +56,14 @@ class Data:
 		self.FPSClock.tick(self.FPS) # so the first dt value isnt really weird
 
 		self.input = input.Input()
-		self.currentLevel = 0 # TEMP FOR TESTING should normally be = 0
-
-		self.CELLSIZE = 64
-
 		self.keybinds = {'left': [K_LEFT, K_a], 'right': [K_RIGHT, K_d],
 						 'jump': [K_SPACE, K_UP, K_w], 'pull': [K_LSHIFT, K_LCTRL]}
+
+		self.currentLevel = 0 # TEMP FOR TESTING should normally be = 0
+		self.CELLSIZE = 64
+
+		self.TIMESTEP = 1.0 / self.FPS
+		self.PPM = float(self.CELLSIZE)
 
 		self.WHITE     = (255, 255, 255)
 		self.BLACK     = (  0,   0,   0)
@@ -78,6 +81,8 @@ class Data:
 
 	def newLevel(self):
 		"""Called just before a new level is loaded to reset everything"""
+		self.world = world(gravity=(0, -10), doSleep=True)
+
 		self.entities = pygame.sprite.Group()
 		self.staticObjects = pygame.sprite.Group()
 		self.dynamicObjects = pygame.sprite.Group()
@@ -96,6 +101,38 @@ class Data:
 		self.playerGroup = pygame.sprite.Group()
 
 		self.spellTargeter = pygame.sprite.GroupSingle()
+
+
+	def drawPhysicsObject(self, obj, targetSurf):
+		"""Draws the rotated obj.image to targetSurf at position denoted by obj.body"""
+		rect = obj.image.get_rect()
+		image = obj.image
+		
+		worldCoords = obj.body.position
+		gameCoords = self.metresToPixelCoords(worldCoords)
+		rect.topleft = gameCoords
+
+		targetSurf.blit(image, rect)
+
+
+	def metresToPixelCoords(self, metres):
+		"""Convert Box2D coordinates to pixel coordinates"""
+		return [metres[0] * self.PPM, self.gameSurf.get_height() - (metres[1] * self.PPM)]
+
+
+	def pixelsToMetreCoords(self, pixels):
+		"""Convert pixel coordinates to Box2D coordinates"""
+		return [pixels[0] / self.PPM, (self.gameSurf.get_height() - pixels[1]) / self.PPM]
+
+
+	def pixelsToMetresConvert(self, pixels):
+		"""Convert pixel units to Box2D metres"""
+		return [pixels[0] / self.PPM, pixels[1] / self.PPM]
+
+
+	def metresToPixelsConvert(self, metres):
+		"""Convert pixel units to Box2D metres"""
+		return [metres[0] * self.PPM, metres[1] * self.PPM]
 
 
 	def saveGame(self):
